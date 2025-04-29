@@ -179,9 +179,7 @@ const TTSRatingPage: React.FC = () => {
   const handleClickNext = () => {
     if (checkScoreValid()) {
       navigator.push('home');
-      console.log('All samples rated:', samples);
     } else {
-      console.log('All samples rated:', samples);
       alert('Please rate all samples before proceeding.');
     }
   }
@@ -307,10 +305,6 @@ const TTSRatingPage: React.FC = () => {
           </div>
         ))}
       </div>
-
-      {samples.map((sample) => {
-        return <>{sample.error ? 't' : 'f'}</>
-      }) }
 
       <div className="flex justify-end mt-6">
         <Button
