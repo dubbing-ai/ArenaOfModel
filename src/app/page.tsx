@@ -1,7 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Star, Globe } from 'lucide-react';
+import { Globe } from 'lucide-react';
+import StarRatingComponent from './components/StarRatingComponent';
+// import Button from './components/Button';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 // Define types
 interface Translation {
@@ -29,6 +33,7 @@ interface Sample {
   name: string;
   naturalness: number;
   similarity: number;
+  error: boolean;
 }
 
 type LanguageCode = 'en' | 'th';
@@ -36,6 +41,8 @@ type LanguageCode = 'en' | 'th';
 const TTSRatingPage: React.FC = () => {
   // Language state
   const [language, setLanguage] = useState<LanguageCode>('en');
+
+  const navigator = useRouter();
 
   // Translations
   const translations = {
@@ -52,11 +59,11 @@ const TTSRatingPage: React.FC = () => {
       step1: '1. First listen to the Reference Voice at the top right',
       step2: '2. Then listen to each Audio Sample below',
       step3: '3. Rate each sample on two criteria:',
-      naturalDesc: 'Naturalness: How natural the voice sounds (0 = robotic, 5 = human-like)',
+      naturalDesc: 'Naturalness: How natural the voice sounds (1 = robotic, 5 = human-like)',
       similarityDesc:
-        'Similarity: How similar the voice is to the reference (0 = different person, 5 = same person)',
-      naturalScale: '(0 = robotic, 5 = completely natural)',
-      similarityScale: '(0 = different person, 5 = same person)',
+        'Similarity: How similar the voice is to the reference (1 = different person, 5 = same person)',
+      naturalScale: '(1 = robotic, 5 = completely natural)',
+      similarityScale: '(1 = different person, 5 = same person)',
     },
     th: {
       title: 'การเปรียบเทียบและการให้คะแนน TTS',
@@ -72,11 +79,11 @@ const TTSRatingPage: React.FC = () => {
       step2: '2. จากนั้นฟังตัวอย่างเสียงแต่ละชิ้นด้านล่าง',
       step3: '3. ให้คะแนนแต่ละตัวอย่างตามเกณฑ์สองข้อ:',
       naturalDesc:
-        'ความเป็นธรรมชาติ: เสียงฟังดูเป็นธรรมชาติแค่ไหน (0 = เหมือนหุ่นยนต์, 5 = เหมือนมนุษย์)',
+        'ความเป็นธรรมชาติ: เสียงฟังดูเป็นธรรมชาติแค่ไหน (1 = เหมือนหุ่นยนต์, 5 = เหมือนมนุษย์)',
       similarityDesc:
-        'ความคล้ายคลึง: เสียงมีความคล้ายคลึงกับเสียงอ้างอิงแค่ไหน (0 = คนละคน, 5 = คนเดียวกัน)',
-      naturalScale: '(0 = เหมือนหุ่นยนต์, 5 = เป็นธรรมชาติอย่างสมบูรณ์)',
-      similarityScale: '(0 = คนละคน, 5 = คนเดียวกัน)',
+        'ความคล้ายคลึง: เสียงมีความคล้ายคลึงกับเสียงอ้างอิงแค่ไหน (1 = คนละคน, 5 = คนเดียวกัน)',
+      naturalScale: '(1 = เหมือนหุ่นยนต์, 5 = เป็นธรรมชาติอย่างสมบูรณ์)',
+      similarityScale: '(1 = คนละคน, 5 = คนเดียวกัน)',
     },
   };
 
@@ -90,6 +97,7 @@ const TTSRatingPage: React.FC = () => {
       name: 'Sample 1',
       naturalness: 0,
       similarity: 0,
+      error: false,
     },
     {
       id: 2,
@@ -97,6 +105,7 @@ const TTSRatingPage: React.FC = () => {
       name: 'Sample 2',
       naturalness: 0,
       similarity: 0,
+      error: false,
     },
     {
       id: 3,
@@ -104,8 +113,78 @@ const TTSRatingPage: React.FC = () => {
       name: 'Sample 3',
       naturalness: 0,
       similarity: 0,
+      error: false,
+    },
+    {
+      id: 4,
+      audioUrl: '/api/placeholder/400/320',
+      name: 'Sample 4',
+      naturalness: 0,
+      similarity: 0,
+      error: false,
+    },
+    {
+      id: 5,
+      audioUrl: '/api/placeholder/400/320',
+      name: 'Sample 5',
+      naturalness: 0,
+      similarity: 0,
+      error: false,
+    },
+    {
+      id: 6,
+      audioUrl: '/api/placeholder/400/320',
+      name: 'Sample 6',
+      naturalness: 0,
+      similarity: 0,
+      error: false,
+    },
+    {
+      id: 7,
+      audioUrl: '/api/placeholder/400/320',
+      name: 'Sample 7',
+      naturalness: 0,
+      similarity: 0,
+      error: false,
     },
   ]);
+
+  //Check score
+  const checkScoreValid = (): boolean => {
+    // First, collect all samples that have validation errors
+    const samplesWithErrors = samples.filter(
+      sample => sample.naturalness === 0 || sample.similarity === 0
+    );
+    
+    // Then, make a single state update with all errors marked appropriately
+    setSamples(prevSamples => {
+      return prevSamples.map(sample => {
+        // First reset all errors
+        const updatedSample = { ...sample, error: false };
+        
+        // Then set error flag for invalid samples
+        if (samplesWithErrors.some(errorSample => errorSample.id === sample.id)) {
+          updatedSample.error = true;
+        }
+        
+        return updatedSample;
+      });
+    });
+    
+    // Return whether all samples are valid
+    return samplesWithErrors.length === 0;
+  }
+
+  //Handle clickNext
+  const handleClickNext = () => {
+    if (checkScoreValid()) {
+      navigator.push('home');
+      console.log('All samples rated:', samples);
+    } else {
+      console.log('All samples rated:', samples);
+      alert('Please rate all samples before proceeding.');
+    }
+  }
 
   // The actual text content being spoken in the audio samples
   const inferencedText =
@@ -121,36 +200,7 @@ const TTSRatingPage: React.FC = () => {
       samples.map((sample) => (sample.id === sampleId ? { ...sample, [category]: value } : sample))
     );
   };
-
-  // TODO: Move this to other file
-  // Star Rating Component
-  interface StarRatingProps {
-    rating: number;
-    maxRating?: number;
-    onRatingChange: (value: number) => void;
-  }
-
-  const StarRating: React.FC<StarRatingProps> = ({ rating, maxRating = 5, onRatingChange }) => {
-    return (
-      <div className="flex space-x-1">
-        {[...Array(maxRating)].map((_, i) => (
-          <button
-            key={i}
-            onClick={() => onRatingChange(i + 1)}
-            className="focus:outline-none"
-            aria-label={`Rate ${i + 1} of ${maxRating}`}
-          >
-            <Star
-              size={24}
-              className={`${
-                i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-              } cursor-pointer`}
-            />
-          </button>
-        ))}
-      </div>
-    );
-  };
+  
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
@@ -240,14 +290,16 @@ const TTSRatingPage: React.FC = () => {
             </div>
 
             <div className="flex justify-center">
-              <StarRating
+              <StarRatingComponent
+                error ={sample.error}
                 rating={sample.naturalness}
                 onRatingChange={(value) => updateRating(sample.id, 'naturalness', value)}
               />
             </div>
 
             <div className="flex justify-center">
-              <StarRating
+              <StarRatingComponent
+                error ={sample.error}
                 rating={sample.similarity}
                 onRatingChange={(value) => updateRating(sample.id, 'similarity', value)}
               />
@@ -255,6 +307,20 @@ const TTSRatingPage: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {samples.map((sample) => {
+        return <>{sample.error ? 't' : 'f'}</>
+      }) }
+
+      <div className="flex justify-end mt-6">
+        <Button
+          onClick={handleClickNext}
+          className='bg-blue-500 hover:bg-blue-700'
+        >
+          Next
+        </Button>
+      </div>
+
     </div>
   );
 };
