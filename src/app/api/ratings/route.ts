@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { AnswerType, TestState } from "@prisma/client";
-import { handleError } from "@/lib/utils";
+import { handleError } from "@/lib/prisma";
 import wavJson from "@/assets/wav.json";
 import models from "@/assets/model.json";
 
