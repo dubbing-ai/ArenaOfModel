@@ -28,13 +28,19 @@ model Rating {
 }
 
 type Answer {
-  naturalness Int
-  similarity  Int
-  wavId       String
+  type  AnswerType
+  wavId String
+  score Int
 }
 
 enum TestState {
   ONE
   TWO
   THREE
+  DONE
+}
+
+enum AnswerType {
+  NATURALNESS
+  SIMILARITY
 }

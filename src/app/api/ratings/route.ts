@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { TestState } from "@prisma/client";
+import { AnswerType, TestState } from "@prisma/client";
 import { handleError } from "@/lib/utils";
 import wavJson from "@/assets/wav.json";
 import models from "@/assets/model.json";
@@ -32,25 +32,25 @@ export async function GET() {
         // Find which model this wavId belongs to
         for (const model of models) {
           if (model.wavId.includes(answer.wavId)) {
-            modelScores[model.modelId].naturalness.sum += answer.naturalness;
-            modelScores[model.modelId].naturalness.count += 1;
-            modelScores[model.modelId].similarity.sum += answer.similarity;
-            modelScores[model.modelId].similarity.count += 1;
+            if (answer.type === AnswerType.NATURALNESS) {
+              modelScores[model.modelId].naturalness.sum += answer.score;
+              modelScores[model.modelId].naturalness.count += 1;
+            } else if (answer.type === AnswerType.SIMILARITY) {
+              modelScores[model.modelId].similarity.sum += answer.score;
+              modelScores[model.modelId].similarity.count += 1;
+            }
             break;
           }
         }
       });
     });
 
-    // Calculate averages
-    interface ModelAverage {
+    const modelAverages: {
       modelId: string;
       naturalness: number;
       similarity: number;
       count: number;
-    }
-
-    const modelAverages: ModelAverage[] = [];
+    }[] = [];
 
     Object.keys(modelScores).forEach((modelId) => {
       const scores = modelScores[modelId];
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Client not found" }, { status: 404 });
     }
 
-    if (client.state !== data.testState) {
+    if (client.state !== data.testState && client.state !== TestState.DONE) {
       return NextResponse.json(
         { error: "Client is not in the first state" },
         { status: 400 }
@@ -119,9 +119,9 @@ export async function POST(request: NextRequest) {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const answers = data.answers.map((answer: any) => ({
+      type: answer.type as AnswerType,
       wavId: answer.wavId,
-      naturalness: answer.naturalness,
-      similarity: answer.similarity,
+      score: answer.score,
     }));
 
     const rating = await prisma.rating.create({
@@ -132,14 +132,21 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    await prisma.client.update({
-      where: {
-        id: data.clientId,
-      },
-      data: {
-        state: testState === TestState.ONE ? TestState.TWO : TestState.THREE,
-      },
-    });
+    if (client.state !== TestState.DONE) {
+      await prisma.client.update({
+        where: {
+          id: data.clientId,
+        },
+        data: {
+          state:
+            testState === TestState.ONE
+              ? TestState.TWO
+              : testState === TestState.TWO
+              ? TestState.THREE
+              : TestState.DONE,
+        },
+      });
+    }
 
     return NextResponse.json(rating, { status: 201 });
   } catch (error) {
