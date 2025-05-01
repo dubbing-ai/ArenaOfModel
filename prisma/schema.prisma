@@ -37,6 +37,10 @@ enum TestState {
   ONE
   TWO
   THREE
+  FOUR
+  FIVE
+  SIX
+  SEVEN
   DONE
 }
 
