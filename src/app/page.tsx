@@ -47,6 +47,8 @@ const TTSRatingPage: React.FC = () => {
 
   // State
   const [language, setLanguage] = useState<LanguageCode>('en');
+  localStorage.setItem("language", language);
+  
   const navigator = useRouter();
   const [uid, setuid] = useState("");
   const [state, setState] = useState<TestState>(TestState.ONE);
@@ -252,7 +254,10 @@ const TTSRatingPage: React.FC = () => {
           <Globe size={20} className="text-gray-600" />
           <select
             value={language}
-            onChange={(e) => setLanguage(e.target.value as LanguageCode)}
+            onChange={(e) => {
+              setLanguage(e.target.value as LanguageCode);
+              localStorage.setItem("language", e.target.value);
+            }}
             className="bg-white border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="en">English</option>
