@@ -5,7 +5,7 @@ import { Globe } from 'lucide-react';
 import StarRatingComponent from './components/StarRatingComponent';
 import { Button } from '@/components/ui/button';
 import { SkeletonPage } from './components/SkeletonPage';
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { AnswerType, TestState, Answer } from "@prisma/client";
 import { toast,Toaster } from "sonner"
 import wav from "@/assets/wav.json";
@@ -47,7 +47,7 @@ const TTSRatingPage: React.FC = () => {
 
   // State
   const [language, setLanguage] = useState<LanguageCode>('en');
-  // const navigator = useRouter();
+  const navigator = useRouter();
   const [uid, setuid] = useState("");
   const [state, setState] = useState<TestState>(TestState.ONE);
   const [answerType, setAnswerType] = useState<AnswerType>(AnswerType.NATURALNESS);
@@ -89,6 +89,9 @@ const TTSRatingPage: React.FC = () => {
       
       setSamples(newSamples);
     }
+    else {
+      navigator.push('done');
+    }
 
     // set localStorage
     localStorage.setItem("clientId", data_format.clientId);
@@ -120,14 +123,11 @@ const TTSRatingPage: React.FC = () => {
       }
     });
     
-    console.log("Available wavIds in wavJS:", wavJS);
-    
-    // Original check
-    console.log("Has missing wavIds:", newAnswers.some((answer: Answer) => !wavJS.includes(answer.wavId)));
     
     const res = await axios.post(`/api/ratings`, {clientId: uid, testState: state, answers: newAnswers});
     const data_format = await res.data;
     initData();
+    toast.error('Score submitted successfully');
     console.log(data_format);
     setLoading(false);
   }
@@ -211,9 +211,9 @@ const TTSRatingPage: React.FC = () => {
   //Handle clickNext
   const handleClickNext = async () => {
     if (checkScoreValid()) {
-      // navigator.push('home');
 
       console.log(samples);
+      toast.error('Submitting your score... please wait.');
       putScore()
 
       // Scroll to the top of the page
@@ -242,8 +242,7 @@ const TTSRatingPage: React.FC = () => {
   };
   
 
-  return loading ? (<SkeletonPage/>):
-  (
+  return (
     <div className="container mx-auto p-6 max-w-6xl">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-center">{t.title}</h1>
@@ -300,6 +299,11 @@ const TTSRatingPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Loading state */}
+      {loading ? (
+        <SkeletonPage/>
+      ) : (
+      <>
       {/* Comparison table header */}
       <div className="grid grid-cols-3 gap-4 mb-2 font-semibold text-center">
         <div className="text-left pl-4">{t.audioSample}</div>
@@ -336,7 +340,9 @@ const TTSRatingPage: React.FC = () => {
           </div>
         ))}
       </div>
-
+      </>
+      )}
+      {/* Next button */}
       <div className="flex justify-end mt-6">
         <Button
           onClick={handleClickNext}
