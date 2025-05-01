@@ -140,10 +140,18 @@ export async function POST(request: NextRequest) {
         data: {
           state:
             testState === TestState.ONE
-              ? TestState.TWO
-              : testState === TestState.TWO
+            ? TestState.TWO
+            : testState === TestState.TWO
               ? TestState.THREE
-              : TestState.DONE,
+              : testState === TestState.THREE
+                ? TestState.FOUR
+                : testState === TestState.FOUR
+                  ? TestState.FIVE
+                  : testState === TestState.FIVE
+                    ? TestState.SIX
+                    : testState === TestState.SIX
+                      ? TestState.SEVEN
+                      : TestState.DONE
         },
       });
     }
