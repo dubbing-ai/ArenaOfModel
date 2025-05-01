@@ -1,11 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Globe } from 'lucide-react';
 import StarRatingComponent from './components/StarRatingComponent';
-// import Button from './components/Button';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { SkeletonPage } from './components/SkeletonPage';
+// import { useRouter } from 'next/navigation';
+import { AnswerType, TestState, Answer } from "@prisma/client";
+import { toast,Toaster } from "sonner"
+import wav from "@/assets/wav.json";
+import axios from 'axios'
 
 // Define types
 interface Translation {
@@ -29,6 +33,7 @@ interface Translation {
 
 interface Sample {
   id: number;
+  wavId: string;
   audioUrl: string;
   name: string;
   naturalness: number;
@@ -39,11 +44,98 @@ interface Sample {
 type LanguageCode = 'en' | 'th';
 
 const TTSRatingPage: React.FC = () => {
-  // Language state
+
+  // State
   const [language, setLanguage] = useState<LanguageCode>('en');
+  // const navigator = useRouter();
+  const [uid, setuid] = useState("");
+  const [state, setState] = useState<TestState>(TestState.ONE);
+  const [answerType, setAnswerType] = useState<AnswerType>(AnswerType.NATURALNESS);
+  const [samples, setSamples] = useState<Sample[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const navigator = useRouter();
+  const initData = async () => {
+    setLoading(true);
+    const res = await axios.post(`/api/init` , {clientId : localStorage.getItem("clientId") || ''});
+    const data_format = await res.data
 
+    // Extract the state and ensure it's properly typed
+    const currentState : TestState = data_format.state as keyof typeof wav;
+
+    setuid(data_format.clientId)
+    setState(currentState)
+
+    // change type of answer
+    if (currentState === TestState.SIX || currentState === TestState.SEVEN) {
+
+      setAnswerType(AnswerType.SIMILARITY)
+      setHeaderTable(t.similarityScale)
+    }
+
+    console.log(currentState);
+    // set samples
+    if (currentState !== TestState.DONE) {
+      console.log(wav[currentState]);
+      // Create a sample for each individual item in the array
+      const newSamples: Sample[] = wav[currentState].map((item, index) => ({
+        id: index + 1,
+        wavId: item,
+        audioUrl: `/api/placeholder/${item}/320`,
+        name: `Sample ${index + 1}`,
+        naturalness: 0,
+        similarity: 0,
+        error: false,
+      }));
+      
+      setSamples(newSamples);
+    }
+
+    // set localStorage
+    localStorage.setItem("clientId", data_format.clientId);
+    setLoading(false);
+  }
+
+  const putScore = async () => {
+    setLoading(true);
+    const newAnswers: Answer[] = await samples.map((sample) => ({
+      type: answerType,
+      wavId: sample.wavId,
+      score: answerType === AnswerType.NATURALNESS ? sample.naturalness : sample.similarity
+    }));
+    
+    const wavJS = wav[state as keyof typeof wav].map((wav) => wav);
+    
+    // Log each answer and whether its wavId exists in wavJS
+    newAnswers.forEach((answer, index) => {
+      const exists = wavJS.includes(answer.wavId);
+      console.log(`Answer ${index}:`, {
+        wavId: answer.wavId,
+        existsInWavJS: exists
+      });
+      
+      // If this is one that doesn't exist, log more details
+      if (!exists) {
+        console.log(`Found missing wavId: ${answer.wavId}`);
+        console.log(`Full answer object:`, answer);
+      }
+    });
+    
+    console.log("Available wavIds in wavJS:", wavJS);
+    
+    // Original check
+    console.log("Has missing wavIds:", newAnswers.some((answer: Answer) => !wavJS.includes(answer.wavId)));
+    
+    const res = await axios.post(`/api/ratings`, {clientId: uid, testState: state, answers: newAnswers});
+    const data_format = await res.data;
+    initData();
+    console.log(data_format);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    initData()
+  }, []);
+  
   // Translations
   const translations = {
     en: {
@@ -88,72 +180,13 @@ const TTSRatingPage: React.FC = () => {
   };
 
   const t: Translation = translations[language]; // Current translation
-
-  // Sample data - in a real app, this would come from your backend
-  const [samples, setSamples] = useState<Sample[]>([
-    {
-      id: 1,
-      audioUrl: '/api/placeholder/400/320',
-      name: 'Sample 1',
-      naturalness: 0,
-      similarity: 0,
-      error: false,
-    },
-    {
-      id: 2,
-      audioUrl: '/api/placeholder/400/320',
-      name: 'Sample 2',
-      naturalness: 0,
-      similarity: 0,
-      error: false,
-    },
-    {
-      id: 3,
-      audioUrl: '/api/placeholder/400/320',
-      name: 'Sample 3',
-      naturalness: 0,
-      similarity: 0,
-      error: false,
-    },
-    {
-      id: 4,
-      audioUrl: '/api/placeholder/400/320',
-      name: 'Sample 4',
-      naturalness: 0,
-      similarity: 0,
-      error: false,
-    },
-    {
-      id: 5,
-      audioUrl: '/api/placeholder/400/320',
-      name: 'Sample 5',
-      naturalness: 0,
-      similarity: 0,
-      error: false,
-    },
-    {
-      id: 6,
-      audioUrl: '/api/placeholder/400/320',
-      name: 'Sample 6',
-      naturalness: 0,
-      similarity: 0,
-      error: false,
-    },
-    {
-      id: 7,
-      audioUrl: '/api/placeholder/400/320',
-      name: 'Sample 7',
-      naturalness: 0,
-      similarity: 0,
-      error: false,
-    },
-  ]);
+  const [headerTable, setHeaderTable] = useState<string>(t.naturalScale);
 
   //Check score
   const checkScoreValid = (): boolean => {
     // First, collect all samples that have validation errors
     const samplesWithErrors = samples.filter(
-      sample => sample.naturalness === 0 || sample.similarity === 0
+      sample => answerType === AnswerType.NATURALNESS ? sample.naturalness === 0 : sample.similarity === 0
     );
     
     // Then, make a single state update with all errors marked appropriately
@@ -176,11 +209,20 @@ const TTSRatingPage: React.FC = () => {
   }
 
   //Handle clickNext
-  const handleClickNext = () => {
+  const handleClickNext = async () => {
     if (checkScoreValid()) {
-      navigator.push('home');
+      // navigator.push('home');
+
+      console.log(samples);
+      putScore()
+
+      // Scroll to the top of the page
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth' // For smooth scrolling; use 'auto' for instant scrolling
+    });
     } else {
-      alert('Please rate all samples before proceeding.');
+      toast.error('Please rate all samples before proceeding.');
     }
   }
 
@@ -200,7 +242,8 @@ const TTSRatingPage: React.FC = () => {
   };
   
 
-  return (
+  return loading ? (<SkeletonPage/>):
+  (
     <div className="container mx-auto p-6 max-w-6xl">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-center">{t.title}</h1>
@@ -258,16 +301,12 @@ const TTSRatingPage: React.FC = () => {
       </div>
 
       {/* Comparison table header */}
-      <div className="grid grid-cols-4 gap-4 mb-2 font-semibold text-center">
+      <div className="grid grid-cols-3 gap-4 mb-2 font-semibold text-center">
         <div className="text-left pl-4">{t.audioSample}</div>
         <div>{t.audio}</div>
         <div>
-          {t.naturalness}
-          <span className="block text-xs font-normal text-gray-500 mt-1">{t.naturalScale}</span>
-        </div>
-        <div>
-          {t.similarity}
-          <span className="block text-xs font-normal text-gray-500 mt-1">{t.similarityScale}</span>
+          {answerType === AnswerType.NATURALNESS ? t.naturalness : t.similarity}
+          <span className="block text-xs font-normal text-gray-500 mt-1">{headerTable}</span>
         </div>
       </div>
 
@@ -276,7 +315,7 @@ const TTSRatingPage: React.FC = () => {
         {samples.map((sample) => (
           <div
             key={sample.id}
-            className="grid grid-cols-4 gap-4 items-center border rounded-lg p-4 shadow"
+            className="grid grid-cols-3 gap-4 items-center border rounded-lg p-4 shadow"
           >
             <div className="font-medium">{sample.name}</div>
 
@@ -290,16 +329,8 @@ const TTSRatingPage: React.FC = () => {
             <div className="flex justify-center">
               <StarRatingComponent
                 error ={sample.error}
-                rating={sample.naturalness}
-                onRatingChange={(value) => updateRating(sample.id, 'naturalness', value)}
-              />
-            </div>
-
-            <div className="flex justify-center">
-              <StarRatingComponent
-                error ={sample.error}
-                rating={sample.similarity}
-                onRatingChange={(value) => updateRating(sample.id, 'similarity', value)}
+                rating={answerType === AnswerType.NATURALNESS ? sample.naturalness : sample.similarity}
+                onRatingChange={(value) => updateRating(sample.id, answerType === AnswerType.NATURALNESS ? 'naturalness' : "similarity", value)}
               />
             </div>
           </div>
@@ -314,8 +345,9 @@ const TTSRatingPage: React.FC = () => {
           Next
         </Button>
       </div>
-
+      <Toaster position="top-right" />
     </div>
+    
   );
 };
 
