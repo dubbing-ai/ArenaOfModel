@@ -62,8 +62,6 @@ const TTSRatingPage: React.FC = () => {
   const [samples, setSamples] = useState<Sample[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const headerTableClass : string = "1-5 scale";
-
   const initData = async () => {
     setLoading(true);
     const res = await axios.post(`/api/init` , {clientId : localStorage.getItem("clientId") || ''});
@@ -83,7 +81,6 @@ const TTSRatingPage: React.FC = () => {
 
     // set samples
     if (currentState !== TestState.DONE) {
-      console.log(wav[currentState]);
       // Create a sample for each individual item in the array
       const newSamples: Sample[] = wav[currentState].map((item, index) => ({
         id: index + 1,
@@ -117,7 +114,6 @@ const TTSRatingPage: React.FC = () => {
     const res = await axios.post(`/api/ratings`, {clientId: uid, testState: state, answers: newAnswers});
     const data_format = await res.data;
     initData();
-    console.log(data_format);
     setLoading(false);
   }
 
@@ -356,7 +352,7 @@ const TTSRatingPage: React.FC = () => {
             <div>{t.audio}</div>
             <div>
               {answerType === AnswerType.NATURALNESS ? t.naturalness : t.similarity}
-              <span className="block text-xs font-normal text-gray-500 mt-1">{headerTableClass}</span>
+              <span className="block text-xs font-normal text-gray-500 mt-1">{headerTable}</span>
             </div>
           </div>
 
