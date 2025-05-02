@@ -233,7 +233,7 @@ const TTSRatingPage: React.FC = () => {
   }
 
   //Handle clickNext
-  const handleClickNext = async () => {
+  const handleClickNext = () => {
     if (checkScoreValid()) {
 
       // Scroll to the top of the page
@@ -271,134 +271,145 @@ const TTSRatingPage: React.FC = () => {
   
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
-
+    <div className="">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-white flex flex-col mb-8">
-        <div className="flex justify-between items-center px-4 py-2">
-          <h1 className="text-2xl font-bold text-center truncate whitespace-nowrap overflow-hidden">
-            {t.title}
-          </h1>
+      <div className="sticky top-0 z-50 bg-white flex flex-col border-b border-gray-300">
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-2">
+            <h1 className="text-2xl font-bold text-center truncate whitespace-nowrap overflow-hidden">
+              {t.title}
+            </h1>
 
-          {/* Language Toggle */}
-          <div className="flex items-center space-x-2">
-            <Globe size={20} className="text-gray-600" />
-            <select
-              value={language}
-              onChange={(e) => {
-                setLanguage(e.target.value as LanguageCode);
-                localStorage.setItem("language", e.target.value);
-              }}
-              className="bg-white border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="en">English</option>
-              <option value="th">ไทย</option>
-            </select>
+            {/* Language Toggle */}
+            <div className="flex items-center space-x-2">
+              <Globe size={20} className="text-gray-600" />
+              <select
+                value={language}
+                onChange={(e) => {
+                  setLanguage(e.target.value as LanguageCode);
+                  localStorage.setItem("language", e.target.value);
+                }}
+                className="bg-white border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="en">English</option>
+                <option value="th">ไทย</option>
+              </select>
+            </div>
           </div>
-        </div>
-        <div className="text-xl font-bold mb-2 px-4">{t.progress}</div>
-        <div className="px-4 pb-2">
+          <div className="text-xl font-bold mb-2">{t.progress}</div>
           <Progress value={(progressCalculation() / 7) * 100} />
         </div>
       </div>
 
-      {/* Instructions */}
-      <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded shadow-sm">
-        <h3 className="text-blue-800 font-bold text-lg mb-2">{t.instructions}</h3>
-        <ul className="space-y-2 text-blue-900">
-          <li className="flex items-start">
-            <span className="font-medium">{t.step1}</span>
-          </li>
-          <li className="flex items-start">
-            <span className="font-medium">{t.step2}</span>
-          </li>
-          <li className="flex flex-col sm:flex-row items-start">
-            <span className="font-medium">{t.step3}</span>
-            <ul className="ml-6 mt-1 space-y-1">
-              <li className="text-sm">• {t.naturalDesc}</li>
-              <li className="text-sm">• {t.similarityDesc}</li>
-            </ul>
-          </li>
-        </ul>
-      </div>
+      {/* Main content */}
+      <div className="container mx-auto p-6 max-w-6xl">
 
-      {/* Top section */}
-      <div className="grid gird-cols-1 sm:grid-cols-2 gap-6 mb-8">
-        <div className="border rounded-lg p-4 shadow bg-gradient-to-r from-blue-50 to-indigo-50">
-          <h2 className="text-xl font-bold mb-2 text-blue-700 border-b pb-2">{t.inferencedText}</h2>
-          <p className="text-gray-700">{inferencedText}</p>
+        {/* Instructions */}
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded shadow-sm">
+          <h3 className="text-blue-800 font-bold text-lg mb-2">{t.instructions}</h3>
+          <ul className="space-y-2 text-blue-900">
+            <li className="flex items-start">
+              <span className="font-medium">{t.step1}</span>
+            </li>
+            <li className="flex items-start">
+              <span className="font-medium">{t.step2}</span>
+            </li>
+            <li className="flex flex-col sm:flex-row items-start">
+              <span className="font-medium">{t.step3}</span>
+              <ul className="ml-6 mt-1 space-y-1">
+                <li className="text-sm">• {t.naturalDesc}</li>
+                <li className="text-sm">• {t.similarityDesc}</li>
+              </ul>
+            </li>
+          </ul>
         </div>
 
-        <div className="border rounded-lg p-4 shadow">
-          <h2 className="text-center sm:text-left text-lg font-semibold mb-2">{t.referenceVoice}</h2>
-          <div className="mt-4">
-            <audio controls className="w-full">
-              <source src="/api/placeholder/400/320" type="audio/mpeg" />
-              Your browser does not support the audio element.
-            </audio>
+        {/* Top section */}
+        <div className="grid gird-cols-1 sm:grid-cols-2 gap-6 mb-8">
+          <div className="border rounded-lg p-4 shadow bg-gradient-to-r from-blue-50 to-indigo-50">
+            <h2 className="text-xl font-bold mb-2 text-blue-700 border-b pb-2">{t.inferencedText}</h2>
+            <p className="text-gray-700">{inferencedText}</p>
           </div>
-        </div>
-      </div>
 
-      {/* Loading state */}
-      {loading ? (
-        <SkeletonPage/>
-      ) : (
-      <>
-        <div className="w-full">
-          {/* Comparison table header - same column structure as rows */}
-          <div className="hidden sm:grid grid-cols-3 gap-4 mb-4 font-semibold text-center ">
-            <div className="text-left pl-4">{t.audioSample}</div>
-            <div>{t.audio}</div>
-            <div>
-              {answerType === AnswerType.NATURALNESS ? t.naturalness : t.similarity}
-              <span className="block text-xs font-normal text-gray-500 mt-1">{headerTable}</span>
+          <div className="border rounded-lg p-4 shadow">
+            <h2 className="text-center sm:text-left text-lg font-semibold mb-2">{t.referenceVoice}</h2>
+            <div className="mt-4">
+              <audio controls className="w-full">
+                <source src="/api/placeholder/400/320" type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
             </div>
           </div>
-
-          {/* Comparison rows */}
-          <div className="space-y-4">
-            {samples.map((sample) => (
-              <div
-                key={sample.id}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border rounded-lg p-4 shadow"
-              >
-                <div className="text-center md:text-left font-medium">
-                  {sample.name}
-                </div>
-                
-                <div className="flex justify-center">
-                  <audio controls className="w-full">
-                    <source src={sample.audioUrl} type="audio/mpeg" />
-                    Your browser does not support the audio element.
-                  </audio>
-                </div>
-
-                <div className="flex justify-center">
-                  <StarRatingComponent
-                    error={sample.error}
-                    rating={answerType === AnswerType.NATURALNESS ? sample.naturalness : sample.similarity}
-                    onRatingChange={(value) => updateRating(sample.id, answerType === AnswerType.NATURALNESS ? 'naturalness' : "similarity", value)}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
-      </>
-      )}
-      {/* Next button */}
-      <div className="flex justify-end mt-6">
-        <Button
-          onClick={handleClickNext}
-          className='bg-blue-500 hover:bg-blue-700'
-        >
-          Next
-        </Button>
+
+        {/* Loading state */}
+        {loading ? (
+          <SkeletonPage/>
+        ) : (
+        <>
+          <div className="w-full">
+
+            {/* Comparison table header - same column structure as rows */}
+            <div className="grid grid-cols-3 gap-4 mb-4 font-semibold text-center md:grid">
+              {/* Desktop view */}
+              <div className="hidden md:block text-left pl-4">{t.audioSample}</div>
+              <div className="hidden md:block">{t.audio}</div>
+              <div className="hidden md:block">
+                {answerType === AnswerType.NATURALNESS ? t.naturalness : t.similarity}
+                <span className="block text-xs font-normal text-gray-500 mt-1">{headerTable}</span>
+              </div>
+
+              {/* Mobile view */}
+              <div className="block md:hidden col-span-3 text-center">
+                {answerType === AnswerType.NATURALNESS ? t.naturalness : t.similarity}
+                <span className="block text-xs font-normal text-gray-500 mt-1">{headerTable}</span>
+              </div>
+            </div>
+
+
+            {/* Comparison rows */}
+            <div className="space-y-4">
+              {samples.map((sample) => (
+                <div
+                  key={sample.id}
+                  className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border rounded-lg p-4 shadow"
+                >
+                  <div className="text-center md:text-left font-medium">
+                    {sample.name}
+                  </div>
+                  
+                  <div className="flex justify-center">
+                    <audio controls className="w-full">
+                      <source src={sample.audioUrl} type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </div>
+
+                  <div className="flex justify-center">
+                    <StarRatingComponent
+                      error={sample.error}
+                      rating={answerType === AnswerType.NATURALNESS ? sample.naturalness : sample.similarity}
+                      onRatingChange={(value) => updateRating(sample.id, answerType === AnswerType.NATURALNESS ? 'naturalness' : "similarity", value)}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+        )}
+        {/* Next button */}
+        <div className="flex justify-end mt-6">
+          <Button
+            onClick={handleClickNext}
+            className='bg-blue-500 hover:bg-blue-700'
+          >
+            Next
+          </Button>
+        </div>
+        <Toaster position="top-right" />
       </div>
-      <Toaster position="top-right" />
     </div>
-    
   );
 };
 
