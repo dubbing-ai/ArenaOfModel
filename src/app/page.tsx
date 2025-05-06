@@ -294,7 +294,9 @@ const TTSRatingPage: React.FC = () => {
               </select>
             </div>
           </div>
-          <div className="text-xl font-bold mb-2">{t.progress}</div>
+          <div className="text-xl font-bold mb-2">
+            {t.progress} {progressCalculation()} / {7}
+          </div>
           <Progress value={(progressCalculation() / 7) * 100} />
         </div>
       </div>
