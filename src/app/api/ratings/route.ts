@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { AnswerType, TestState } from "@prisma/client";
-import { handleError } from "@/lib/utils";
+import { handleError } from "@/lib/prisma";
 import wavJson from "@/assets/wav.json";
 import models from "@/assets/model.json";
 
@@ -132,18 +132,38 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    let nextState: TestState;
+    switch (testState) {
+      case TestState.ONE:
+        nextState = TestState.TWO;
+        break;
+      case TestState.TWO:
+        nextState = TestState.THREE;
+        break;
+      case TestState.THREE:
+        nextState = TestState.FOUR;
+        break;
+      case TestState.FOUR:
+        nextState = TestState.FIVE;
+        break;
+      case TestState.FIVE:
+        nextState = TestState.SIX;
+        break;
+      case TestState.SIX:
+        nextState = TestState.SEVEN;
+        break;
+      case TestState.SEVEN:
+      default:
+        nextState = TestState.DONE;
+        break;
+    }
     if (client.state !== TestState.DONE) {
       await prisma.client.update({
         where: {
           id: data.clientId,
         },
         data: {
-          state:
-            testState === TestState.ONE
-              ? TestState.TWO
-              : testState === TestState.TWO
-              ? TestState.THREE
-              : TestState.DONE,
+          state: nextState
         },
       });
     }
