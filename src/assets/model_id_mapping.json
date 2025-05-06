@@ -1,0 +1,9 @@
+{
+  "./wav/[tsync2-denoised_lj]-[cv_no_my-vctk]": "1",
+  "./wav/[tsync2-denoised_lj]-H100[vctk-cv_no_my-vtc]": "2",
+  "./wav/another-vits": "3",
+  "./wav/f5-output-v3": "4",
+  "./wav/tsync2_cv_no-my": "5",
+  "./wav/typhoon": "6",
+  "groundtruth": "0"
+}

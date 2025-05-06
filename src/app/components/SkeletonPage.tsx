@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from "@/components/ui/skeleton";
 
 function SkeletonPage({}: React.ComponentProps<"div">) {
   return (
@@ -14,23 +14,25 @@ function SkeletonPage({}: React.ComponentProps<"div">) {
           </div>
           <div>
             <Skeleton className="h-6 w-32 mx-auto" />
-            <Skeleton className="h-4 w-40 mx-auto mt-1" /> {/* For the smaller header text */}
+            <Skeleton className="h-4 w-40 mx-auto mt-1" />{" "}
+            {/* For the smaller header text */}
           </div>
         </div>
 
         {/* Comparison rows skeleton */}
         <div className="space-y-4">
-          {[1, 2, 3, 4, 5, 6 ,7].map((i) => (
-            <div 
-              key={i} 
+          {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <div
+              key={i}
               className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border rounded-lg p-5 shadow"
             >
               <div className="text-center md:text-left">
                 <Skeleton className="h-5 w-32 md:ml-0 mx-auto md:mx-0" />
               </div>
-              
+
               <div className="flex justify-center">
-                <Skeleton className="h-12 w-full rounded-md max-w-md" /> {/* Audio player skeleton */}
+                <Skeleton className="h-12 w-full rounded-md max-w-md" />{" "}
+                {/* Audio player skeleton */}
               </div>
 
               <div className="flex justify-center">

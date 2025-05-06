@@ -1,22 +1,33 @@
-'use client';
+"use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { LanguageCode } from "../types/translation";
 
 export default function ThankYouPage() {
+  const [language, setLanguage] = useState<LanguageCode | undefined>();
   const translations = {
     en: {
-      first: '🎉 Thank You!',
-      second: 'We really appreciate you taking the time to score our project.',
-      third: 'Your feedback helps us improve and grow.',
+      first: "🎉 Thank You!",
+      second: "We really appreciate you taking the time to score our project.",
+      third: "We will use this information to improve and develop further.",
     },
     th: {
-      first: '🎉 ขอบคุณ!',
-      second: 'เราขอขอบคุณที่สละเวลาให้คะแนนโครงการของเรา',
-      third: 'ข้อเสนอแนะแบบนี้ช่วยให้เราพัฒนาและเติบโตได้',
+      first: "🎉 ขอบคุณ!",
+      second: "เราขอขอบคุณที่สละเวลาให้คะแนนโครงการของเรา",
+      third: "เราจะนำข้อมูลนี้ไปปรับปรุงและพัฒนาให้ดีขึ้น",
     },
   };
 
-  const language = (localStorage.getItem("language") || "en") as keyof typeof translations;
+  useEffect(() => {
+    const lang = localStorage.getItem("language");
+    if (!lang) {
+      localStorage.setItem("language", "th");
+      setLanguage("th");
+    } else setLanguage(localStorage.getItem("language") as LanguageCode);
+  }, [language]);
+
+  if (!language) return <div>Loading...</div>;
+
   const text = translations[language];
 
   return (
