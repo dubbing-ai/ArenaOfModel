@@ -9,12 +9,12 @@ export default function ThankYouPage() {
     en: {
       first: "🎉 Thank You!",
       second: "We really appreciate you taking the time to score our project.",
-      third: "Your feedback helps us improve and grow.",
+      third: "We will use this information to improve and develop further.",
     },
     th: {
       first: "🎉 ขอบคุณ!",
       second: "เราขอขอบคุณที่สละเวลาให้คะแนนโครงการของเรา",
-      third: "ข้อเสนอแนะแบบนี้ช่วยให้เราพัฒนาและเติบโตได้",
+      third: "เราจะนำข้อมูลนี้ไปปรับปรุงและพัฒนาให้ดีขึ้น",
     },
   };
 
