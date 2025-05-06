@@ -30,7 +30,7 @@ model Rating {
 type Answer {
   type  AnswerType
   wavId String
-  score Int
+  score Float
 }
 
 enum TestState {

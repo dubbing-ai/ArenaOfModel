@@ -1,5 +1,5 @@
 {
-  "ONE": [
+  "cv044": [
     "s9zam",
     "gry4m",
     "85d8d",
@@ -8,7 +8,7 @@
     "mpltl",
     "cv044_114_mic1"
   ],
-  "TWO": [
+  "cv062": [
     "st9gd",
     "9p4zt",
     "2des1",
@@ -17,7 +17,7 @@
     "rlm7z",
     "cv062_138_mic1"
   ],
-  "THREE": [
+  "speaker-008": [
     "0e7ib",
     "3mrdu",
     "yflcg",
@@ -26,25 +26,7 @@
     "ivqx8",
     "speaker-008-female_TH001"
   ],
-  "FOUR": [
-    "7zjea",
-    "nsumf",
-    "oaown",
-    "xeht1",
-    "87ql3",
-    "i4j7l",
-    "speaker-021-male_EN003"
-  ],
-  "FIVE": [
-    "4384v",
-    "6hvjf",
-    "6fc9s",
-    "smlw0",
-    "5r9d4",
-    "aqbwk",
-    "speaker-010-female_TH002"
-  ],
-  "SIX": [
+  "speaker-009": [
     "ss0jw",
     "4vgy5",
     "9wtin",
@@ -53,7 +35,25 @@
     "g3hu8",
     "speaker-009-male_TH003"
   ],
-  "SEVEN": [
+  "speaker-010": [
+    "4384v",
+    "6hvjf",
+    "6fc9s",
+    "smlw0",
+    "5r9d4",
+    "aqbwk",
+    "speaker-010-female_TH002"
+  ],
+  "speaker-021": [
+    "7zjea",
+    "nsumf",
+    "oaown",
+    "xeht1",
+    "87ql3",
+    "i4j7l",
+    "speaker-021-male_EN003"
+  ],
+  "speaker-024": [
     "fux14",
     "9l7lm",
     "t4tfr",
@@ -61,6 +61,5 @@
     "c2bww",
     "faolg",
     "speaker-024-female_TH002"
-  ],
-  "DONE": []
+  ]
 }

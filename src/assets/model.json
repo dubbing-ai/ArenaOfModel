@@ -1,9 +1,38 @@
 [
-  { "modelId": "1", "wavId": ["1", "2", "3", "4", "5", "6", "7"] },
-  { "modelId": "2", "wavId": ["8", "9", "10", "11", "12", "13", "14"] },
-  { "modelId": "3", "wavId": ["15", "16", "17", "18", "19", "20", "21"] },
-  { "modelId": "4", "wavId": ["22", "23", "24", "25", "26", "27", "28"] },
-  { "modelId": "5", "wavId": ["29", "30", "31", "32", "33", "34", "35"] },
-  { "modelId": "6", "wavId": ["36", "37", "38", "39", "40", "41", "42"] },
-  { "modelId": "7", "wavId": ["43", "44", "45", "46", "47", "48", "49"] }
+  {
+    "modelId": "0",
+    "wavId": [
+      "cv044_114_mic1",
+      "cv062_138_mic1",
+      "speaker-008-female_TH001",
+      "speaker-009-male_TH003",
+      "speaker-010-female_TH002",
+      "speaker-021-male_EN003",
+      "speaker-024-female_TH002"
+    ]
+  },
+  {
+    "modelId": "1",
+    "wavId": ["s9zam", "st9gd", "0e7ib", "ss0jw", "4384v", "7zjea", "fux14"]
+  },
+  {
+    "modelId": "2",
+    "wavId": ["gry4m", "9p4zt", "3mrdu", "4vgy5", "6hvjf", "nsumf", "9l7lm"]
+  },
+  {
+    "modelId": "3",
+    "wavId": ["85d8d", "2des1", "yflcg", "9wtin", "6fc9s", "oaown", "t4tfr"]
+  },
+  {
+    "modelId": "4",
+    "wavId": ["3ontg", "y45rr", "qboa3", "sp8y8", "smlw0", "xeht1", "1m660"]
+  },
+  {
+    "modelId": "5",
+    "wavId": ["p6io3", "kfbym", "aagna", "vvi0k", "5r9d4", "87ql3", "c2bww"]
+  },
+  {
+    "modelId": "6",
+    "wavId": ["mpltl", "rlm7z", "ivqx8", "g3hu8", "aqbwk", "i4j7l", "faolg"]
+  }
 ]
