@@ -67,7 +67,16 @@ const TTSRatingPage: React.FC = () => {
         error: false,
       }));
 
-      setSamples([...newSamples].sort(() => Math.random() - 0.5));
+      const shuffledSamples = [...newSamples];
+      for (let i = shuffledSamples.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledSamples[i], shuffledSamples[j]] = [
+          shuffledSamples[j],
+          shuffledSamples[i],
+        ];
+      }
+      console.log(shuffledSamples.map((sample) => sample.wavId));
+      setSamples(shuffledSamples);
     } else {
       navigator.push("done");
     }
