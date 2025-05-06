@@ -49,7 +49,8 @@ export async function GET() {
       modelId: string;
       naturalness: number;
       similarity: number;
-      count: number;
+      naturalnessCount: number;
+      similarityCount: number;
     }[] = [];
 
     Object.keys(modelScores).forEach((modelId) => {
@@ -64,7 +65,8 @@ export async function GET() {
           scores.similarity.count > 0
             ? scores.similarity.sum / scores.similarity.count
             : 0,
-        count: scores.naturalness.count,
+        naturalnessCount: scores.naturalness.count,
+        similarityCount: scores.similarity.count,
       });
     });
 
@@ -163,12 +165,12 @@ export async function POST(request: NextRequest) {
           id: data.clientId,
         },
         data: {
-          state: nextState
+          state: nextState,
         },
       });
     }
 
-    return NextResponse.json(rating, { status: 201 });
+    return NextResponse.json({ ...rating, nextState }, { status: 201 });
   } catch (error) {
     return handleError(error);
   }
