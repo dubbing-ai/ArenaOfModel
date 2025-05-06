@@ -154,7 +154,9 @@ const TTSRatingPage: React.FC = () => {
       next: "Next",
       instructions: "Rating Instructions:",
       step1: "1. First listen to the Reference Voice at the top right",
-      step2: "2. Then listen to each Audio Sample below",
+      step2: "2. This test consists of 7 steps:",
+      step2Naturalness: "Steps 1-5 will be for rating Naturalness of the voice",
+      step2Similarity: "Steps 6-7 will be for rating Similarity of the voice",
       step3: "3. Rate each sample on two criteria:",
       naturalDesc:
         "Naturalness: How natural the voice sounds (1 = robotic, 5 = human-like)",
@@ -177,9 +179,11 @@ const TTSRatingPage: React.FC = () => {
       naturalness: "ความเป็นธรรมชาติ",
       similarity: "ความคล้ายคลึง",
       next: "ถัดไป",
-      instructions: "คำแนะนำในการให้คะแนน:",
-      step1: "1. ฟังเสียงอ้างอิงที่มุมบนขวาก่อน",
-      step2: "2. จากนั้นฟังตัวอย่างเสียงแต่ละชิ้นด้านล่าง",
+      instructions: "เกี่ยวกับแบบทดสอบนี้:",
+      step1: "1. แบบทดสอบนี้ใช้เวลาไม่เกิน 10 นาที",
+      step2: "2. แบบทดสอบนี้มีทั้งหมด 7 ขั้นตอน:",
+      step2Naturalness: "ขั้นตอนที่ 1-5 จะเป็นการให้คะแนนความเป็นธรรมชาติ",
+      step2Similarity: "ขั้นตอนที่ 6-7 จะเป็นการให้คะแนนความคล้ายคลึง",
       step3: "3. ให้คะแนนแต่ละตัวอย่างตามเกณฑ์สองข้อ:",
       naturalDesc:
         "ความเป็นธรรมชาติ: เสียงฟังดูเป็นธรรมชาติแค่ไหน (1 = เหมือนหุ่นยนต์, 5 = เหมือนมนุษย์)",
@@ -306,8 +310,12 @@ const TTSRatingPage: React.FC = () => {
             <li className="flex items-start">
               <span className="font-medium">{t.step1}</span>
             </li>
-            <li className="flex items-start">
+            <li className="flex flex-col sm:flex-row items-start">
               <span className="font-medium">{t.step2}</span>
+              <ul className="ml-6 mt-1 space-y-1">
+                <li className="text-sm">• {t.step2Naturalness}</li>
+                <li className="text-sm">• {t.step2Similarity}</li>
+              </ul>
             </li>
             <li className="flex flex-col sm:flex-row items-start">
               <span className="font-medium">{t.step3}</span>
@@ -319,31 +327,31 @@ const TTSRatingPage: React.FC = () => {
           </ul>
         </div>
 
-        {/* Top section */}
-        <div className="grid gird-cols-1 sm:grid-cols-2 gap-6 mb-8">
-          {state === TestState.SIX || state === TestState.SEVEN ? (
-            <div className="border col-span-1 sm:col-span-2 rounded-lg p-4 shadow">
-              <h2 className="text-center sm:text-left text-lg font-semibold mb-2">
-                {t.referenceVoice}
-              </h2>
-              <div className="mt-4">
-                <audio controls className="w-full">
-                  <source
-                    src={`/wav/ref/${refVoiceState[state]}.wav`}
-                    type="audio/mpeg"
-                  />
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
-            </div>
-          ) : null}
-        </div>
-
         {/* Loading state */}
         {loading ? (
           <SkeletonPage />
         ) : (
           <>
+            {/* Top section */}
+            <div className="grid gird-cols-1 sm:grid-cols-2 gap-6 mb-8">
+              {state === TestState.SIX || state === TestState.SEVEN ? (
+                <div className="border col-span-1 sm:col-span-2 rounded-lg p-4 shadow">
+                  <h2 className="text-center sm:text-left text-lg font-semibold mb-2">
+                    {t.referenceVoice}
+                  </h2>
+                  <div className="mt-4">
+                    <audio controls className="w-full">
+                      <source
+                        src={`/wav/ref/${refVoiceState[state]}.wav`}
+                        type="audio/mpeg"
+                      />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
             <div className="w-full">
               {/* Comparison table header - same column structure as rows */}
               <div className="grid grid-cols-3 gap-4 mb-4 font-semibold text-center md:grid">

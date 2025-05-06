@@ -10,6 +10,8 @@ export interface TranslationFirstPage {
   instructions: string;
   step1: string;
   step2: string;
+  step2Similarity: string;
+  step2Naturalness: string;
   step3: string;
   naturalDesc: string;
   similarityDesc: string;
