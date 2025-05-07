@@ -52,7 +52,6 @@ const TTSRatingPage: React.FC = () => {
     // change type of answer
     if (currentState === TestState.SIX || currentState === TestState.SEVEN) {
       setAnswerType(AnswerType.SIMILARITY);
-      setHeaderTable(t.similarityScale);
     }
 
     // set samples
@@ -157,11 +156,27 @@ const TTSRatingPage: React.FC = () => {
       step2: "2. This test consists of 7 steps:",
       step2Naturalness: "Steps 1-5 will be for rating Naturalness of the voice",
       step2Similarity: "Steps 6-7 will be for rating Similarity of the voice",
-      step3: "3. Rate each sample on two criteria:",
-      naturalDesc:
-        "Naturalness: How natural the voice sounds (1 = robotic, 5 = human-like)",
-      similarityDesc:
-        "Similarity: How similar the voice is to the reference (1 = different person, 5 = same person)",
+      step3: "3. For the naturalness rating:",
+      step3Label1:
+        "1 : Completely unnatural - Sounds robotic or very artificial.",
+      step3Label2:
+        "2 : Mostly unnatural - Many unnatural parts, hard to listen to.",
+      step3Label3:
+        "3 : Somewhat natural - Understandable, but has clear synthetic traits.",
+      step3Label4:
+        "4 : Mostly natural - Minor unnaturalness, but generally sounds human.",
+      step3Label5: "5 : Completely natural - Sounds like real human speech.",
+      step4: "4. For the similarity rating:",
+      step4Label1:
+        "1 : Completely different - Sounds like a totally different person.",
+      step4Label2:
+        "2 : Mostly different - Some resemblance, but clearly not the same speaker.",
+      step4Label3:
+        "3 : Somewhat similar - Noticeable overlap, but clear differences in voice.",
+      step4Label4:
+        "4 : Mostly similar - Sounds very much like the same speaker, with minor flaws.",
+      step4Label5:
+        "5 : Identical - Indistinguishable from the original speaker.",
       naturalScale: "(1 = robotic, 5 = completely natural)",
       similarityScale: "(1 = different person, 5 = same person)",
       loading: "Submitting your score... please wait.",
@@ -184,13 +199,28 @@ const TTSRatingPage: React.FC = () => {
       step2: "2. แบบทดสอบนี้มีทั้งหมด 7 ขั้นตอน:",
       step2Naturalness: "ขั้นตอนที่ 1-5 จะเป็นการให้คะแนนความเป็นธรรมชาติ",
       step2Similarity: "ขั้นตอนที่ 6-7 จะเป็นการให้คะแนนความคล้ายคลึง",
-      step3: "3. ให้คะแนนแต่ละตัวอย่างตามเกณฑ์สองข้อ:",
-      naturalDesc:
-        "ความเป็นธรรมชาติ: เสียงฟังดูเป็นธรรมชาติแค่ไหน (1 = เหมือนหุ่นยนต์, 5 = เหมือนมนุษย์)",
-      similarityDesc:
-        "ความคล้ายคลึง: เสียงมีความคล้ายคลึงกับเสียงอ้างอิงแค่ไหน (1 = คนละคน, 5 = คนเดียวกัน)",
-      naturalScale: "(1 = เหมือนหุ่นยนต์, 5 = เป็นธรรมชาติอย่างสมบูรณ์)",
-      similarityScale: "(1 = คนละคน, 5 = คนเดียวกัน)",
+      step3: "3. สำหรับการให้คะแนนความเป็นธรรมชาติ:",
+      step3Label1:
+        "1 : ไม่เป็นธรรมชาติเลย - ฟังดูเหมือนหุ่นยนต์หรือเสียงสังเคราะห์อย่างชัดเจน",
+      step3Label2:
+        "2 : ไม่เป็นธรรมชาติเป็นส่วนใหญ่ - มีส่วนที่ไม่เป็นธรรมชาติหลายจุด ฟังยาก",
+      step3Label3:
+        "3 : ค่อนข้างเป็นธรรมชาติ - เข้าใจได้ แต่มีลักษณะของเสียงสังเคราะห์ที่ชัดเจน",
+      step3Label4:
+        "4 : มีความเป็นธรรมชาติเป็นส่วนใหญ่ - มีความไม่เป็นธรรมชาติเล็กน้อย แต่โดยรวมฟังดูเหมือนเสียงมนุษย์",
+      step3Label5:
+        "5 : เป็นธรรมชาติโดยสมบูรณ์ - ฟังดูเหมือนเสียงพูดของมนุษย์จริงๆ",
+      step4: "4. สำหรับการให้คะแนนความคล้ายคลึง:",
+      step4Label1:
+        "1 : แตกต่างโดยสิ้นเชิง - ฟังดูเหมือนเป็นคนละคนกันอย่างสิ้นเชิง",
+      step4Label2:
+        "2 : แตกต่างเป็นส่วนใหญ่ - มีความคล้ายคลึงบ้าง แต่ชัดเจนว่าไม่ใช่ผู้พูดคนเดียวกัน",
+      step4Label3:
+        "3 : คล้ายคลึงพอสมควร - มีความซ้อนทับที่สังเกตได้ แต่มีความแตกต่างชัดเจนในน้ำเสียง",
+      step4Label4:
+        "4 : คล้ายคลึงเป็นส่วนใหญ่ - ฟังดูเหมือนผู้พูดคนเดียวกันมาก มีความแตกต่างเล็กน้อย",
+      step4Label5:
+        "5 : เหมือนกันทุกประการ - ไม่สามารถแยกแยะได้จากผู้พูดต้นฉบับ",
       loading: "กำลังส่งคะแนนของคุณ... กรุณารอสักครู่",
       success: "ส่งคะแนนเรียบร้อยแล้ว",
       error: "เกิดข้อผิดพลาด",
@@ -200,15 +230,6 @@ const TTSRatingPage: React.FC = () => {
   };
 
   const t: TranslationFirstPage = translations[language || "th"]; // Current translation
-  const [headerTable, setHeaderTable] = useState<string>(t.naturalScale);
-
-  useEffect(() => {
-    if (state === TestState.SIX || state === TestState.SEVEN) {
-      setHeaderTable(t.similarityScale);
-    } else {
-      setHeaderTable(t.naturalScale);
-    }
-  }, [t]);
 
   //Check score
   const checkScoreValid = (): boolean => {
@@ -302,7 +323,7 @@ const TTSRatingPage: React.FC = () => {
       </div>
 
       {/* Main content */}
-      <div className="container mx-auto p-6 max-w-6xl">
+      <div className="container mx-auto p-6 max-w-6xl ">
         {/* Instructions */}
         <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded shadow-sm">
           <h3 className="text-blue-800 font-bold text-lg mb-2">
@@ -322,8 +343,21 @@ const TTSRatingPage: React.FC = () => {
             <li className="flex flex-col sm:flex-row items-start">
               <span className="font-medium">{t.step3}</span>
               <ul className="ml-6 mt-1 space-y-1">
-                <li className="text-sm">• {t.naturalDesc}</li>
-                <li className="text-sm">• {t.similarityDesc}</li>
+                <li className="text-sm">• {t.step3Label5}</li>
+                <li className="text-sm">• {t.step3Label4}</li>
+                <li className="text-sm">• {t.step3Label3}</li>
+                <li className="text-sm">• {t.step3Label2}</li>
+                <li className="text-sm">• {t.step3Label1}</li>
+              </ul>
+            </li>
+            <li className="flex flex-col sm:flex-row items-start">
+              <span className="font-medium">{t.step4}</span>
+              <ul className="ml-6 mt-1 space-y-1">
+                <li className="text-sm">• {t.step4Label5}</li>
+                <li className="text-sm">• {t.step4Label4}</li>
+                <li className="text-sm">• {t.step4Label3}</li>
+                <li className="text-sm">• {t.step4Label2}</li>
+                <li className="text-sm">• {t.step4Label1}</li>
               </ul>
             </li>
           </ul>
@@ -366,9 +400,6 @@ const TTSRatingPage: React.FC = () => {
                   {answerType === AnswerType.NATURALNESS
                     ? t.naturalness
                     : t.similarity}
-                  <span className="block text-xs font-normal text-gray-500 mt-1">
-                    {headerTable}
-                  </span>
                 </div>
 
                 {/* Mobile view */}
@@ -376,9 +407,6 @@ const TTSRatingPage: React.FC = () => {
                   {answerType === AnswerType.NATURALNESS
                     ? t.naturalness
                     : t.similarity}
-                  <span className="block text-xs font-normal text-gray-500 mt-1">
-                    {headerTable}
-                  </span>
                 </div>
               </div>
 
@@ -434,8 +462,34 @@ const TTSRatingPage: React.FC = () => {
             </div>
           </>
         )}
-        <Toaster position="top-right" />
       </div>
+
+      <footer className="bg-white text-gray-800 mt-8 py-8 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.1)]">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-xl font-medium mb-2">อาจารย์ที่ปรึกษา</h3>
+              <ul className="ml-4">
+                <li className="mb-1">• อ.ดร.เจษฎา ธัชแก้วกรพินธุ์</li>
+                <li>• ผศ.ดร.เอกพล ช่วงสุวนิช</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-medium mb-2">จัดทำโดยนิสิต</h3>
+              <ul className="ml-4">
+                <li className="mb-1">• ธนัส วงศ์สมุทร</li>
+                <li className="mb-1">• กรวุฒิ ศิริอนันตภัทร์</li>
+                <li className="mb-1">• ปุญญพัฒน์ สุรเกียรติกำจร</li>
+                <li className="mb-1">• ณัฎฐ์ญณิณ ชยานุวงศ์</li>
+                <li>• ธนกร สุธรรมเกษม</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <Toaster position="top-right" />
     </div>
   );
 };
