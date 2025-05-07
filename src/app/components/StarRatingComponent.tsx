@@ -6,6 +6,7 @@ interface StarRatingComponentProps {
   maxRating?: number;
   onRatingChange: (value: number) => void;
   error?: boolean;
+  stepSize?: 0.5 | 1; // New prop to control step size
 }
 
 const StarRatingComponent: React.FC<StarRatingComponentProps> = ({
@@ -13,6 +14,7 @@ const StarRatingComponent: React.FC<StarRatingComponentProps> = ({
   maxRating = 5,
   onRatingChange,
   error = false,
+  stepSize = 1, // Default to half-star increments
 }) => {
   const [hoveredRating, setHoveredRating] = useState(0);
   const [displayRating, setDisplayRating] = useState(rating);
@@ -23,6 +25,12 @@ const StarRatingComponent: React.FC<StarRatingComponentProps> = ({
 
   const handleMouseLeave = () => {
     setHoveredRating(0);
+  };
+
+  const handleRatingChange = (newRating: number) => {
+    // If step size is 1, round to the nearest integer
+    const adjustedRating = stepSize === 1 ? Math.round(newRating) : newRating;
+    onRatingChange(adjustedRating);
   };
 
   const renderStars = () => {
@@ -43,31 +51,47 @@ const StarRatingComponent: React.FC<StarRatingComponentProps> = ({
             }`}
           />
 
-          {/* Left half (for half-star) */}
-          <div
-            className="absolute top-0 left-0 w-3 h-6 cursor-pointer overflow-hidden z-10"
-            onMouseEnter={() => setHoveredRating(Math.max(1, i - 0.5))}
-            onClick={() => onRatingChange(Math.max(1, i - 0.5))}
-          >
-            {activeRating >= i - 0.5 && (
-              <Star size={24} className="text-yellow-400 fill-yellow-400" />
-            )}
-          </div>
+          {stepSize === 0.5 ? (
+            // Half-star increment mode
+            <>
+              {/* Left half (for half-star) */}
+              <div
+                className="absolute top-0 left-0 w-3 h-6 cursor-pointer overflow-hidden z-10"
+                onMouseEnter={() => setHoveredRating(Math.max(1, i - 0.5))}
+                onClick={() => handleRatingChange(Math.max(1, i - 0.5))}
+              >
+                {activeRating >= i - 0.5 && (
+                  <Star size={24} className="text-yellow-400 fill-yellow-400" />
+                )}
+              </div>
 
-          {/* Right half (for full star) */}
-          <div
-            className="absolute top-0 right-0 w-3 h-6 cursor-pointer overflow-hidden z-10"
-            onMouseEnter={() => setHoveredRating(Math.max(1, i))}
-            onClick={() => onRatingChange(Math.max(1, i))}
-          >
-            {activeRating >= i && (
-              <Star
-                size={24}
-                className="text-yellow-400 fill-yellow-400"
-                style={{ marginLeft: "-12px" }}
-              />
-            )}
-          </div>
+              {/* Right half (for full star) */}
+              <div
+                className="absolute top-0 right-0 w-3 h-6 cursor-pointer overflow-hidden z-10"
+                onMouseEnter={() => setHoveredRating(Math.max(1, i))}
+                onClick={() => handleRatingChange(Math.max(1, i))}
+              >
+                {activeRating >= i && (
+                  <Star
+                    size={24}
+                    className="text-yellow-400 fill-yellow-400"
+                    style={{ marginLeft: "-12px" }}
+                  />
+                )}
+              </div>
+            </>
+          ) : (
+            // Full-star increment mode
+            <div
+              className="absolute top-0 left-0 w-6 h-6 cursor-pointer z-10"
+              onMouseEnter={() => setHoveredRating(i)}
+              onClick={() => handleRatingChange(i)}
+            >
+              {activeRating >= i && (
+                <Star size={24} className="text-yellow-400 fill-yellow-400" />
+              )}
+            </div>
+          )}
         </div>
       );
     }
