@@ -542,6 +542,7 @@ const TTSRatingPage: React.FC = () => {
                             ? "คะแนนความคล้ายคลึง"
                             : "Similarity Rating"
                         }
+                        language={language}
                       />
                     </div>
                   </li>

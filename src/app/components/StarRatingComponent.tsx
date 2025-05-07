@@ -3,6 +3,7 @@ import { Star } from "lucide-react";
 import { LanguageCode } from "../types/translation";
 
 interface StarRatingComponentProps {
+  language?: LanguageCode;
   rating: number;
   maxRating?: number;
   onRatingChange: (value: number) => void;
@@ -13,6 +14,7 @@ interface StarRatingComponentProps {
 }
 
 const StarRatingComponent: React.FC<StarRatingComponentProps> = ({
+  language = "th",
   rating = 0,
   maxRating = 5,
   onRatingChange,
@@ -22,19 +24,10 @@ const StarRatingComponent: React.FC<StarRatingComponentProps> = ({
   ariaLabel = "Rating",
 }) => {
   const [displayRating, setDisplayRating] = useState(rating);
-  const [language, setLanguage] = useState<LanguageCode | undefined>();
 
   useEffect(() => {
     setDisplayRating(rating);
   }, [rating]);
-
-  useEffect(() => {
-    const lang = localStorage.getItem("language");
-    if (!lang) {
-      localStorage.setItem("language", "th");
-      setLanguage("th");
-    } else setLanguage(lang as LanguageCode);
-  }, [language]);
 
   const handleRatingChange = (newRating: number) => {
     // If step size is 1, round to the nearest integer
