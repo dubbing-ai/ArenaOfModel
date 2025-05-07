@@ -163,18 +163,11 @@ const TTSRatingPage: React.FC = () => {
       step3Label4: "4 : Good",
       step3Label5: "5 : Excellent",
       step4: "4. For the similarity rating:",
-      step4Label1:
-        "1 : Completely different - Sounds like a totally different person.",
-      step4Label2:
-        "2 : Mostly different - Some resemblance, but clearly not the same speaker.",
-      step4Label3:
-        "3 : Somewhat similar - Noticeable overlap, but clear differences in voice.",
-      step4Label4:
-        "4 : Mostly similar - Sounds very much like the same speaker, with minor flaws.",
-      step4Label5:
-        "5 : Identical - Indistinguishable from the original speaker.",
-      naturalScale: "(1 = robotic, 5 = completely natural)",
-      similarityScale: "(1 = different person, 5 = same person)",
+      step4Label1: "1 : Completely different person",
+      step4Label2: "2 : Probably a different person",
+      step4Label3: "3 : Similar",
+      step4Label4: "4 : Probably the same person",
+      step4Label5: "5 : Exactly the same person",
       loading: "Submitting your score... please wait.",
       success: "Score submitted successfully",
       error: "Error",
@@ -202,15 +195,11 @@ const TTSRatingPage: React.FC = () => {
       step3Label4: "4 : ดี",
       step3Label5: "5 : ดีเยี่ยม",
       step4: "4. สำหรับการให้คะแนนความคล้ายคลึง:",
-      step4Label1:
-        "1 : แตกต่างโดยสิ้นเชิง - ฟังดูเหมือนเป็นคนละคนกันอย่างสิ้นเชิง",
-      step4Label2:
-        "2 : แตกต่างเป็นส่วนใหญ่ - มีความคล้ายคลึงบ้าง แต่น่าจะเป็นคนละคนกัน",
-      step4Label3: "3 : คล้ายคลึงพอสมควร - มีความคล้ายคลึงกันอย่างเห็นได้ชัด",
-      step4Label4:
-        "4 : คล้ายคลึงเป็นส่วนใหญ่ - ฟังดูเหมือนผู้พูดคนเดียวกันมาก มีความแตกต่างเล็กน้อย",
-      step4Label5:
-        "5 : เหมือนกันทุกประการ - ไม่สามารถแยกแยะได้จากผู้พูดต้นฉบับ",
+      step4Label1: "1 : คนละคนกันอย่างสิ้นเชิง",
+      step4Label2: "2 : น่าจะเป็นคนละคนกัน",
+      step4Label3: "3 : คล้ายคลึงกัน",
+      step4Label4: "4 : น่าจะเป็นคนเดียวกัน",
+      step4Label5: "5 : เป็นคนเดียวกันอย่างแน่นอน",
       loading: "กำลังส่งคะแนนของคุณ... กรุณารอสักครู่",
       success: "ส่งคะแนนเรียบร้อยแล้ว",
       error: "เกิดข้อผิดพลาด",
