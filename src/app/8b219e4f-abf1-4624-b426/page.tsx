@@ -22,6 +22,9 @@ const RatingsTable: React.FC = () => {
   const [data, setData] = useState<TableResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [language, setLanguage] = useState<LanguageCode>("th");
+  const [highestScores, setHighestScores] = useState<Record<string, number>>(
+    {}
+  );
 
   // Translations
   const translations = {
@@ -103,12 +106,52 @@ const RatingsTable: React.FC = () => {
     return { male, female };
   };
 
+  // Calculate highest scores for each category, excluding groundtruth
+  const calculateHighestScores = () => {
+    if (!data) return {};
+
+    const highestScores: Record<string, number> = {};
+
+    // Initialize with lowest possible score
+    data.categories.forEach((category) => {
+      highestScores[category] = -Infinity;
+    });
+
+    // Find highest score for each category, excluding groundtruth (modelId = "0")
+    data.tableData.forEach((row) => {
+      // Skip groundtruth model
+      if (row.modelId === "0") {
+        return;
+      }
+
+      data.categories.forEach((category) => {
+        if (
+          row[category] !== undefined &&
+          typeof row[category] === "object" &&
+          "avg" in row[category]
+        ) {
+          const score = (row[category] as { avg: number }).avg;
+          if (score > highestScores[category]) {
+            highestScores[category] = score;
+          }
+        }
+      });
+    });
+
+    return highestScores;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const response = await axios.get("/api/ratings-table");
         setData(response.data);
+
+        // Calculate highest scores after data is loaded
+        setTimeout(() => {
+          setHighestScores(calculateHighestScores());
+        }, 0);
       } catch (error) {
         console.error("Error fetching ratings table data:", error);
       } finally {
@@ -124,6 +167,13 @@ const RatingsTable: React.FC = () => {
       setLanguage(savedLanguage as LanguageCode);
     }
   }, []);
+
+  // Recalculate highest scores when data changes
+  useEffect(() => {
+    if (data) {
+      setHighestScores(calculateHighestScores());
+    }
+  }, [data]);
 
   // Handle language change
   const handleLanguageChange = (newLanguage: LanguageCode) => {
@@ -239,43 +289,66 @@ const RatingsTable: React.FC = () => {
                       {row.modelId === "1" && <sup>3</sup>}
                     </td>
                     {/* Male Category Cells */}
-                    {groupedCategories.male.map((category, catIdx) => (
-                      <td
-                        key={`male-cell-${catIdx}`}
-                        className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500 border-r"
-                      >
-                        {row[category] !== undefined &&
-                        typeof row[category] === "object" &&
-                        "avg" in row[category] &&
-                        "count" in row[category]
-                          ? `${(
-                              row[category] as { avg: number; count: number }
-                            ).avg.toFixed(2)}/${
-                              (row[category] as { avg: number; count: number })
-                                .count
-                            }`
-                          : "-"}
-                      </td>
-                    ))}
+                    {groupedCategories.male.map((category, catIdx) => {
+                      // Determine if this cell has the highest score
+                      const cellData = row[category];
+                      const isHighestScore =
+                        row.modelId !== "0" &&
+                        cellData !== undefined &&
+                        typeof cellData === "object" &&
+                        "avg" in cellData &&
+                        Math.abs(cellData.avg - highestScores[category]) <
+                          0.001; // Use small epsilon for float comparison
+
+                      return (
+                        <td
+                          key={`male-cell-${catIdx}`}
+                          className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500 border-r"
+                        >
+                          {cellData !== undefined &&
+                          typeof cellData === "object" &&
+                          "avg" in cellData &&
+                          "count" in cellData ? (
+                            <span className={isHighestScore ? "font-bold" : ""}>
+                              {cellData.avg.toFixed(2)}/{cellData.count}
+                            </span>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                      );
+                    })}
+
                     {/* Female Category Cells */}
-                    {groupedCategories.female.map((category, catIdx) => (
-                      <td
-                        key={`female-cell-${catIdx}`}
-                        className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500 border-r"
-                      >
-                        {row[category] !== undefined &&
-                        typeof row[category] === "object" &&
-                        "avg" in row[category] &&
-                        "count" in row[category]
-                          ? `${(
-                              row[category] as { avg: number; count: number }
-                            ).avg.toFixed(2)}/${
-                              (row[category] as { avg: number; count: number })
-                                .count
-                            }`
-                          : "-"}
-                      </td>
-                    ))}
+                    {groupedCategories.female.map((category, catIdx) => {
+                      // Determine if this cell has the highest score
+                      const cellData = row[category];
+                      const isHighestScore =
+                        row.modelId !== "0" &&
+                        cellData !== undefined &&
+                        typeof cellData === "object" &&
+                        "avg" in cellData &&
+                        Math.abs(cellData.avg - highestScores[category]) <
+                          0.001; // Use small epsilon for float comparison
+
+                      return (
+                        <td
+                          key={`female-cell-${catIdx}`}
+                          className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500 border-r"
+                        >
+                          {cellData !== undefined &&
+                          typeof cellData === "object" &&
+                          "avg" in cellData &&
+                          "count" in cellData ? (
+                            <span className={isHighestScore ? "font-bold" : ""}>
+                              {cellData.avg.toFixed(2)}/{cellData.count}
+                            </span>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>
