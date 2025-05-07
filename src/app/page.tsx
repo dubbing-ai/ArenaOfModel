@@ -36,6 +36,8 @@ const TTSRatingPage: React.FC = () => {
   const [samples, setSamples] = useState<Sample[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [ariaAnnouncement, setAriaAnnouncement] = useState<string>("");
+
   const initData = async () => {
     setLoading(true);
     const res = await axios.post(`/api/init`, {
@@ -242,6 +244,13 @@ const TTSRatingPage: React.FC = () => {
         behavior: "smooth", // For smooth scrolling; use 'auto' for instant scrolling
       });
 
+      // Announce to screen readers that we're submitting
+      announceToScreenReader(
+        language === "th"
+          ? "กำลังส่งคะแนน กรุณารอสักครู่"
+          : "Submitting scores, please wait"
+      );
+
       // toast promise
       toast.promise(putScore(), {
         loading: t.loading,
@@ -249,8 +258,22 @@ const TTSRatingPage: React.FC = () => {
         error: t.error,
       });
     } else {
+      // Announce error
+      announceToScreenReader(
+        language === "th"
+          ? "กรุณาให้คะแนนทุกตัวอย่างก่อนดำเนินการต่อ"
+          : "Please rate all samples before proceeding"
+      );
+
       toast.error(t.errorRate);
     }
+  };
+
+  // Add this function to handle aria announcements
+  const announceToScreenReader = (message: string) => {
+    setAriaAnnouncement(message);
+    // Clear the message after a reasonable time so it can be announced again if needed
+    setTimeout(() => setAriaAnnouncement(""), 1000);
   };
 
   // Update ratings
@@ -261,17 +284,44 @@ const TTSRatingPage: React.FC = () => {
   ): void => {
     setSamples(
       samples.map((sample) =>
-        sample.id === sampleId ? { ...sample, [category]: value } : sample
+        sample.id === sampleId
+          ? { ...sample, [category]: value, error: false }
+          : sample
       )
     );
+
+    // Announce to screen readers
+    const ratingType =
+      category === "naturalness"
+        ? language === "th"
+          ? "คุณภาพ"
+          : "quality"
+        : language === "th"
+        ? "ความคล้ายคลึง"
+        : "similarity";
+
+    const announcement =
+      language === "th"
+        ? `ให้คะแนน ${ratingType} ${value} จาก 5`
+        : `Rated ${ratingType} ${value} out of 5`;
+
+    announceToScreenReader(announcement);
   };
 
   if (!language) return <div>Loading...</div>;
 
   return (
     <div className="">
+      {/* Live region for screen reader announcements */}
+      <div aria-live="assertive" className="sr-only" role="status">
+        {ariaAnnouncement}
+      </div>
+
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-white flex flex-col border-b border-gray-300">
+      <div
+        className="sticky top-0 z-50 bg-white flex flex-col border-b border-gray-300"
+        aria-label={language === "th" ? "ส่วนหัว" : "Header"}
+      >
         <div className="p-4">
           <div className="flex justify-between items-center mb-2">
             <h1 className="text-2xl font-bold text-center truncate whitespace-nowrap overflow-hidden">
@@ -286,8 +336,16 @@ const TTSRatingPage: React.FC = () => {
                 onChange={(e) => {
                   setLanguage(e.target.value as LanguageCode);
                   localStorage.setItem("language", e.target.value);
+
+                  // Announce language change
+                  const langAnnouncement =
+                    e.target.value === "th"
+                      ? "เปลี่ยนภาษาเป็นภาษาไทย"
+                      : "Language changed to English";
+                  announceToScreenReader(langAnnouncement);
                 }}
                 className="bg-white border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label={language === "th" ? "เลือกภาษา" : "Select language"}
               >
                 <option value="en">English</option>
                 <option value="th">ไทย</option>
@@ -302,9 +360,13 @@ const TTSRatingPage: React.FC = () => {
       </div>
 
       {/* Main content */}
-      <div className="container mx-auto p-6 max-w-6xl ">
+      <div id="main-content" className="container mx-auto p-6 max-w-6xl">
         {/* Instructions */}
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded shadow-sm">
+        <div
+          className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded shadow-sm"
+          role="region"
+          aria-label={language === "th" ? "คำแนะนำ" : "Instructions"}
+        >
           <h3 className="text-blue-800 font-bold text-lg mb-2">
             {t.instructions}
           </h3>
@@ -344,32 +406,60 @@ const TTSRatingPage: React.FC = () => {
 
         {/* Loading state */}
         {loading ? (
-          <SkeletonPage />
+          <>
+            <div aria-live="polite" className="sr-only" role="status">
+              {language === "th"
+                ? "กำลังโหลด กรุณารอสักครู่"
+                : "Loading, please wait"}
+            </div>
+            <SkeletonPage />
+          </>
         ) : (
           <>
             {/* Top section */}
-            <div className="grid gird-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <div
+              className="grid gird-cols-1 sm:grid-cols-2 gap-6 mb-8"
+              aria-label={
+                language === "th" ? "เสียงอ้างอิง" : "Reference Voice"
+              }
+            >
               {state === TestState.SIX || state === TestState.SEVEN ? (
                 <div className="border col-span-1 sm:col-span-2 rounded-lg p-4 shadow">
-                  <h2 className="text-center sm:text-left text-lg font-semibold mb-2">
+                  <h2
+                    className="text-center sm:text-left text-lg font-semibold mb-2"
+                    id="reference-voice-heading"
+                  >
                     {t.referenceVoice}
                   </h2>
                   <div className="mt-4">
-                    <audio controls className="w-full">
+                    <audio
+                      controls
+                      className="w-full"
+                      aria-labelledby="reference-voice-heading"
+                    >
                       <source
                         src={`/wav/ref/${refVoiceState[state]}.wav`}
                         type="audio/mpeg"
                       />
-                      Your browser does not support the audio element.
+                      {language === "th"
+                        ? "เบราว์เซอร์ของคุณไม่รองรับการเล่นเสียง"
+                        : "Your browser does not support the audio element."}
                     </audio>
                   </div>
                 </div>
               ) : null}
             </div>
 
-            <div className="w-full">
+            <div
+              className="w-full"
+              role="region"
+              aria-label={language === "th" ? "ตัวอย่างเสียง" : "Audio Samples"}
+            >
               {/* Comparison table header - same column structure as rows */}
-              <div className="grid grid-cols-3 gap-4 mb-4 font-semibold text-center md:grid">
+              <div
+                className="grid grid-cols-3 gap-4 mb-4 font-semibold text-center md:grid"
+                aria-hidden="true"
+              >
                 {/* Desktop view */}
                 <div className="hidden md:block text-left pl-4">
                   {t.audioSample}
@@ -389,21 +479,39 @@ const TTSRatingPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* Screen reader heading */}
+              <h2 className="sr-only">
+                {language === "th"
+                  ? "ตัวอย่างเสียงเพื่อให้คะแนน"
+                  : "Audio Samples for Rating"}
+              </h2>
+
               {/* Comparison rows */}
-              <div className="space-y-4">
+              <ul className="space-y-4" role="list">
                 {samples.map((sample, idx) => (
-                  <div
+                  <li
                     key={sample.id}
                     className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border rounded-lg p-4 shadow"
                   >
-                    <div className="text-center md:text-left font-medium">
-                      Sample {idx + 1}
+                    <div
+                      className="text-center md:text-left font-medium"
+                      id={`sample-${idx + 1}-heading`}
+                    >
+                      {language === "th"
+                        ? `ตัวอย่างที่ ${idx + 1}`
+                        : `Sample ${idx + 1}`}
                     </div>
 
                     <div className="flex justify-center">
-                      <audio controls className="w-full">
+                      <audio
+                        controls
+                        className="w-full"
+                        aria-labelledby={`sample-${idx + 1}-heading`}
+                      >
                         <source src={sample.audioUrl} type="audio/mpeg" />
-                        Your browser does not support the audio element.
+                        {language === "th"
+                          ? "เบราว์เซอร์ของคุณไม่รองรับการเล่นเสียง"
+                          : "Your browser does not support the audio element."}
                       </audio>
                     </div>
 
@@ -424,17 +532,30 @@ const TTSRatingPage: React.FC = () => {
                             value
                           )
                         }
+                        id={`sample-${idx + 1}-rating`}
+                        ariaLabel={
+                          answerType === AnswerType.NATURALNESS
+                            ? language === "th"
+                              ? "คะแนนคุณภาพ"
+                              : "Quality Rating"
+                            : language === "th"
+                            ? "คะแนนความคล้ายคลึง"
+                            : "Similarity Rating"
+                        }
                       />
                     </div>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
             {/* Next button */}
             <div className="flex justify-end mt-6">
               <Button
                 onClick={handleClickNext}
                 className="bg-blue-500 hover:bg-blue-700 cursor-pointer"
+                aria-label={
+                  language === "th" ? "ไปยังขั้นตอนถัดไป" : "Go to next step"
+                }
               >
                 {t.next}
               </Button>
@@ -443,7 +564,10 @@ const TTSRatingPage: React.FC = () => {
         )}
       </div>
 
-      <footer className="bg-white text-gray-800 mt-8 py-8 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.1)]">
+      <footer
+        className="bg-white text-gray-800 mt-8 py-8 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.1)]"
+        aria-label={language === "th" ? "ส่วนท้าย" : "Footer"}
+      >
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-center md:text-left">
             <div>
