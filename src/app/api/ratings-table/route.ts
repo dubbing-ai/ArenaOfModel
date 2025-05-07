@@ -15,16 +15,16 @@ const MODEL_NAMES: Record<string, string> = {
 };
 
 // Categories mapping based on TestState
-const CATEGORIES: Record<TestState, { label: string, gender: string, type: string }> = {
-  [TestState.ONE]: { label: "Seen Thai", gender: "Male", type: "seen" },
-  [TestState.TWO]: { label: "Seen Thai", gender: "Female", type: "seen" },
-  [TestState.THREE]: { label: "Unseen Thai", gender: "Female", type: "unseen" },
-  [TestState.FOUR]: { label: "Unseen Thai w/ Trans.", gender: "Female", type: "unseen" },
-  [TestState.FIVE]: { label: "Unseen English", gender: "Male", type: "unseen" },
-  // SIX and SEVEN not currently needed, but keep them for completeness
-  [TestState.SIX]: { label: "Not Used", gender: "Not Used", type: "not_used" },
-  [TestState.SEVEN]: { label: "Not Used", gender: "Not Used", type: "not_used" },
-  [TestState.DONE]: { label: "Unknown", gender: "Unknown", type: "unknown" }
+const CATEGORIES: Record<TestState, { label: string, gender: string, type: string, measureType: string }> = {
+  [TestState.ONE]: { label: "Seen Thai", gender: "Male", type: "seen", measureType: "naturalness" },
+  [TestState.TWO]: { label: "Seen Thai", gender: "Female", type: "seen", measureType: "naturalness" },
+  [TestState.THREE]: { label: "Unseen Thai", gender: "Female", type: "unseen", measureType: "naturalness" },
+  [TestState.FOUR]: { label: "Unseen Thai w/ Trans.", gender: "Female", type: "unseen", measureType: "naturalness" },
+  [TestState.FIVE]: { label: "Unseen English", gender: "Male", type: "unseen", measureType: "naturalness" },
+  // Updated SIX and SEVEN to correctly reflect their categories
+  [TestState.SIX]: { label: "Unseen EN to TH", gender: "Female", type: "unseen", measureType: "similarity" },
+  [TestState.SEVEN]: { label: "Unseen TH to TH", gender: "Male", type: "unseen", measureType: "similarity" },
+  [TestState.DONE]: { label: "Unknown", gender: "Unknown", type: "unknown", measureType: "unknown" }
 };
 
 // GET /api/ratings-table - Get all ratings in table format
@@ -109,12 +109,23 @@ export async function GET() {
     
     // Group by categories for easier frontend rendering
     const categories = Object.values(CATEGORIES)
-      .filter(cat => cat.label !== "Unknown" && cat.label !== "Not Used")
+      .filter(cat => cat.label !== "Unknown")
       .map(cat => `${cat.gender}-${cat.label}`);
+    
+    // Separate naturalness and similarity categories
+    const naturalnessCategories = Object.entries(CATEGORIES)
+      .filter(([, cat]) => cat.measureType === "naturalness")
+      .map(([, cat]) => `${cat.gender}-${cat.label}`);
+    
+    const similarityCategories = Object.entries(CATEGORIES)
+      .filter(([, cat]) => cat.measureType === "similarity")
+      .map(([, cat]) => `${cat.gender}-${cat.label}`);
     
     return NextResponse.json({ 
       tableData,
       categories,
+      naturalnessCategories,
+      similarityCategories,
       totalRatings: ratings.length
     });
   } catch (error) {
