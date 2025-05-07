@@ -154,7 +154,7 @@ const TTSRatingPage: React.FC = () => {
       instructions: "Rating Instructions:",
       step1: "1. First listen to the Reference Voice at the top right",
       step2: "2. This test consists of 7 steps:",
-      step2Naturalness: "Steps 1-5 will be for rating Naturalness of the voice",
+      step2Naturalness: "Steps 1-5 will be for rating Quality of the voice",
       step2Similarity: "Steps 6-7 will be for rating Similarity of the voice",
       step3: "3. For the quality rating:",
       step3Label1: "1 : Very poor",
