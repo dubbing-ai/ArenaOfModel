@@ -148,24 +148,20 @@ const TTSRatingPage: React.FC = () => {
       referenceVoice: "Reference Voice",
       audioSample: "Audio Sample",
       audio: "Audio",
-      naturalness: "Naturalness",
+      naturalness: "Quality",
       similarity: "Similarity",
       next: "Next",
       instructions: "Rating Instructions:",
       step1: "1. First listen to the Reference Voice at the top right",
       step2: "2. This test consists of 7 steps:",
-      step2Naturalness: "Steps 1-5 will be for rating Naturalness of the voice",
+      step2Naturalness: "Steps 1-5 will be for rating Quality of the voice",
       step2Similarity: "Steps 6-7 will be for rating Similarity of the voice",
-      step3: "3. For the naturalness rating:",
-      step3Label1:
-        "1 : Completely unnatural - Sounds robotic or very artificial.",
-      step3Label2:
-        "2 : Mostly unnatural - Many unnatural parts, hard to listen to.",
-      step3Label3:
-        "3 : Somewhat natural - Understandable, but has clear synthetic traits.",
-      step3Label4:
-        "4 : Mostly natural - Minor unnaturalness, but generally sounds human.",
-      step3Label5: "5 : Completely natural - Sounds like real human speech.",
+      step3: "3. For the quality rating:",
+      step3Label1: "1 : Very poor",
+      step3Label2: "2 : Poor",
+      step3Label3: "3 : Fair",
+      step3Label4: "4 : Good",
+      step3Label5: "5 : Excellent",
       step4: "4. For the similarity rating:",
       step4Label1:
         "1 : Completely different - Sounds like a totally different person.",
@@ -191,32 +187,26 @@ const TTSRatingPage: React.FC = () => {
       referenceVoice: "เสียงอ้างอิง",
       audioSample: "ตัวอย่างเสียง",
       audio: "เสียง",
-      naturalness: "ความเป็นธรรมชาติ",
+      naturalness: "คุณภาพของเสียง",
       similarity: "ความคล้ายคลึง",
       next: "ถัดไป",
       instructions: "เกี่ยวกับแบบทดสอบนี้:",
       step1: "1. แบบทดสอบนี้ใช้เวลาไม่เกิน 10 นาที",
       step2: "2. แบบทดสอบนี้มีทั้งหมด 7 ขั้นตอน:",
-      step2Naturalness: "ขั้นตอนที่ 1-5 จะเป็นการให้คะแนนความเป็นธรรมชาติ",
+      step2Naturalness: "ขั้นตอนที่ 1-5 จะเป็นการให้คะแนนคุณภาพของเสียง",
       step2Similarity: "ขั้นตอนที่ 6-7 จะเป็นการให้คะแนนความคล้ายคลึง",
-      step3: "3. สำหรับการให้คะแนนความเป็นธรรมชาติ:",
-      step3Label1:
-        "1 : ไม่เป็นธรรมชาติเลย - ฟังดูเหมือนหุ่นยนต์หรือเสียงสังเคราะห์อย่างชัดเจน",
-      step3Label2:
-        "2 : ไม่เป็นธรรมชาติเป็นส่วนใหญ่ - มีส่วนที่ไม่เป็นธรรมชาติหลายจุด ฟังยาก",
-      step3Label3:
-        "3 : ค่อนข้างเป็นธรรมชาติ - เข้าใจได้ แต่มีลักษณะของเสียงสังเคราะห์ที่ชัดเจน",
-      step3Label4:
-        "4 : มีความเป็นธรรมชาติเป็นส่วนใหญ่ - มีความไม่เป็นธรรมชาติเล็กน้อย แต่โดยรวมฟังดูเหมือนเสียงมนุษย์",
-      step3Label5:
-        "5 : เป็นธรรมชาติโดยสมบูรณ์ - ฟังดูเหมือนเสียงพูดของมนุษย์จริงๆ",
+      step3: "3. สำหรับการให้คะแนนคุณภาพของเสียง:",
+      step3Label1: "1 : แย่มาก",
+      step3Label2: "2 : แย่",
+      step3Label3: "3 : พอใช้",
+      step3Label4: "4 : ดี",
+      step3Label5: "5 : ดีเยี่ยม",
       step4: "4. สำหรับการให้คะแนนความคล้ายคลึง:",
       step4Label1:
         "1 : แตกต่างโดยสิ้นเชิง - ฟังดูเหมือนเป็นคนละคนกันอย่างสิ้นเชิง",
       step4Label2:
-        "2 : แตกต่างเป็นส่วนใหญ่ - มีความคล้ายคลึงบ้าง แต่ชัดเจนว่าไม่ใช่ผู้พูดคนเดียวกัน",
-      step4Label3:
-        "3 : คล้ายคลึงพอสมควร - มีความซ้อนทับที่สังเกตได้ แต่มีความแตกต่างชัดเจนในน้ำเสียง",
+        "2 : แตกต่างเป็นส่วนใหญ่ - มีความคล้ายคลึงบ้าง แต่น่าจะเป็นคนละคนกัน",
+      step4Label3: "3 : คล้ายคลึงพอสมควร - มีความคล้ายคลึงกันอย่างเห็นได้ชัด",
       step4Label4:
         "4 : คล้ายคลึงเป็นส่วนใหญ่ - ฟังดูเหมือนผู้พูดคนเดียวกันมาก มีความแตกต่างเล็กน้อย",
       step4Label5:
