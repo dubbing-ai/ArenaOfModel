@@ -445,7 +445,7 @@ const TTSRatingPage: React.FC = () => {
 
       <footer className="bg-white text-gray-800 mt-8 py-8 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.1)]">
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-center md:text-left">
             <div>
               <h3 className="text-xl font-medium mb-2">อาจารย์ที่ปรึกษา</h3>
               <ul className="ml-4">
