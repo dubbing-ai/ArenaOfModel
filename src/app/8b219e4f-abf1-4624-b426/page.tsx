@@ -15,6 +15,8 @@ interface TableData {
 interface TableResponse {
   tableData: TableData[];
   categories: string[];
+  naturalnessCategories: string[];
+  similarityCategories: string[];
   totalRatings: number;
 }
 
@@ -25,11 +27,15 @@ const RatingsTable: React.FC = () => {
   const [highestScores, setHighestScores] = useState<Record<string, number>>(
     {}
   );
+  const [highestSimilarityScores, setHighestSimilarityScores] = useState<
+    Record<string, number>
+  >({});
 
   // Translations
   const translations = {
     en: {
       title: "Naturalness Mean Opinion Score for TTS Models",
+      similarityTitle: "Similarity Mean Opinion Score for TTS Models",
       loading: "Loading data...",
       male: "Male",
       female: "Female",
@@ -37,6 +43,8 @@ const RatingsTable: React.FC = () => {
       unseenThai: "Unseen Thai",
       unseenEnglish: "Unseen English",
       unseenThaiWithTrans: "Unseen Thai w/ Trans.",
+      unseenENtoTH: "Unseen EN to TH",
+      unseenTHtoTH: "Unseen TH to TH",
       ratings: "Total Ratings:",
       footer: "Table of averaged user ratings for TTS model comparison",
       notes: "Notes:",
@@ -46,6 +54,7 @@ const RatingsTable: React.FC = () => {
     },
     th: {
       title: "คะแนนความเห็นเฉลี่ยด้านความเป็นธรรมชาติสำหรับโมเดล TTS",
+      similarityTitle: "คะแนนความเห็นเฉลี่ยด้านความคล้ายคลึงสำหรับโมเดล TTS",
       loading: "กำลังโหลดข้อมูล...",
       male: "ชาย",
       female: "หญิง",
@@ -53,6 +62,8 @@ const RatingsTable: React.FC = () => {
       unseenThai: "ไทย (ไม่เคยเห็น)",
       unseenEnglish: "อังกฤษ (ไม่เคยเห็น)",
       unseenThaiWithTrans: "ไทย พร้อมแปล (ไม่เคยเห็น)",
+      unseenENtoTH: "อังกฤษเป็นไทย (ไม่เคยเห็น)",
+      unseenTHtoTH: "ไทยเป็นไทย (ไม่เคยเห็น)",
       ratings: "จำนวนการให้คะแนนทั้งหมด:",
       footer: "ตารางคะแนนเฉลี่ยจากผู้ใช้สำหรับการเปรียบเทียบโมเดล TTS",
       notes: "หมายเหตุ:",
@@ -66,35 +77,33 @@ const RatingsTable: React.FC = () => {
 
   // Format category names
   const formatCategory = (category: string): string => {
-    const [gender, label] = category.split("-");
-
-    // Skip "Not Used" categories
-    if (label === "Not Used") {
-      return "";
-    }
+    const [gender, ...labelParts] = category.split("-");
+    const label = labelParts.join("-");
 
     if (gender === "Male") {
       if (label === "Seen Thai") return t.seenThai;
       if (label === "Unseen Thai") return t.unseenThai;
       if (label === "Unseen English") return t.unseenEnglish;
+      if (label === "Unseen TH to TH") return t.unseenTHtoTH;
     } else if (gender === "Female") {
       if (label === "Seen Thai") return t.seenThai;
       if (label === "Unseen Thai") return t.unseenThai;
       if (label === "Unseen Thai w/ Trans.") return t.unseenThaiWithTrans;
+      if (label === "Unseen EN to TH") return t.unseenENtoTH;
     }
     return label;
   };
 
   // Group categories by gender
-  const getGroupedCategories = () => {
-    if (!data) return { male: [], female: [] };
+  const getGroupedCategories = (categoryList: string[]) => {
+    if (!categoryList || categoryList.length === 0)
+      return { male: [], female: [] };
 
     const male: string[] = [];
     const female: string[] = [];
 
-    data.categories.forEach((category) => {
-      const [gender, label] = category.split("-");
-      if (label === "Not Used") return;
+    categoryList.forEach((category) => {
+      const [gender] = category.split("-");
 
       if (gender === "Male") {
         male.push(category);
@@ -107,13 +116,13 @@ const RatingsTable: React.FC = () => {
   };
 
   // Calculate highest scores for each category, excluding groundtruth
-  const calculateHighestScores = () => {
-    if (!data) return {};
+  const calculateHighestScores = (categories: string[]) => {
+    if (!data || !categories) return {};
 
     const highestScores: Record<string, number> = {};
 
     // Initialize with lowest possible score
-    data.categories.forEach((category) => {
+    categories.forEach((category) => {
       highestScores[category] = -Infinity;
     });
 
@@ -124,7 +133,7 @@ const RatingsTable: React.FC = () => {
         return;
       }
 
-      data.categories.forEach((category) => {
+      categories.forEach((category) => {
         if (
           row[category] !== undefined &&
           typeof row[category] === "object" &&
@@ -150,7 +159,16 @@ const RatingsTable: React.FC = () => {
 
         // Calculate highest scores after data is loaded
         setTimeout(() => {
-          setHighestScores(calculateHighestScores());
+          if (response.data.naturalnessCategories) {
+            setHighestScores(
+              calculateHighestScores(response.data.naturalnessCategories)
+            );
+          }
+          if (response.data.similarityCategories) {
+            setHighestSimilarityScores(
+              calculateHighestScores(response.data.similarityCategories)
+            );
+          }
         }, 0);
       } catch (error) {
         console.error("Error fetching ratings table data:", error);
@@ -171,7 +189,14 @@ const RatingsTable: React.FC = () => {
   // Recalculate highest scores when data changes
   useEffect(() => {
     if (data) {
-      setHighestScores(calculateHighestScores());
+      if (data.naturalnessCategories) {
+        setHighestScores(calculateHighestScores(data.naturalnessCategories));
+      }
+      if (data.similarityCategories) {
+        setHighestSimilarityScores(
+          calculateHighestScores(data.similarityCategories)
+        );
+      }
     }
   }, [data]);
 
@@ -196,7 +221,13 @@ const RatingsTable: React.FC = () => {
     );
   }
 
-  const groupedCategories = getGroupedCategories();
+  const naturalnessCategoriesGrouped = data?.naturalnessCategories
+    ? getGroupedCategories(data.naturalnessCategories)
+    : { male: [], female: [] };
+
+  const similarityCategoriesGrouped = data?.similarityCategories
+    ? getGroupedCategories(data.similarityCategories)
+    : { male: [], female: [] };
 
   return (
     <div className="container mx-auto p-6">
@@ -221,7 +252,8 @@ const RatingsTable: React.FC = () => {
 
       {data && (
         <>
-          <div className="overflow-x-auto">
+          {/* Naturalness Table */}
+          <div className="overflow-x-auto mb-12">
             <table className="min-w-full divide-y divide-gray-200 border">
               <thead className="bg-gray-50">
                 <tr>
@@ -233,20 +265,20 @@ const RatingsTable: React.FC = () => {
                     Model
                   </th>
                   {/* Male Category Group */}
-                  {groupedCategories.male.length > 0 && (
+                  {naturalnessCategoriesGrouped.male.length > 0 && (
                     <th
                       scope="col"
-                      colSpan={groupedCategories.male.length}
+                      colSpan={naturalnessCategoriesGrouped.male.length}
                       className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-b"
                     >
                       {t.male}
                     </th>
                   )}
                   {/* Female Category Group */}
-                  {groupedCategories.female.length > 0 && (
+                  {naturalnessCategoriesGrouped.female.length > 0 && (
                     <th
                       scope="col"
-                      colSpan={groupedCategories.female.length}
+                      colSpan={naturalnessCategoriesGrouped.female.length}
                       className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-b"
                     >
                       {t.female}
@@ -255,7 +287,7 @@ const RatingsTable: React.FC = () => {
                 </tr>
                 <tr>
                   {/* Male Subcategories */}
-                  {groupedCategories.male.map((category, index) => (
+                  {naturalnessCategoriesGrouped.male.map((category, index) => (
                     <th
                       key={`male-${index}`}
                       scope="col"
@@ -265,15 +297,17 @@ const RatingsTable: React.FC = () => {
                     </th>
                   ))}
                   {/* Female Subcategories */}
-                  {groupedCategories.female.map((category, index) => (
-                    <th
-                      key={`female-${index}`}
-                      scope="col"
-                      className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r"
-                    >
-                      {formatCategory(category)}
-                    </th>
-                  ))}
+                  {naturalnessCategoriesGrouped.female.map(
+                    (category, index) => (
+                      <th
+                        key={`female-${index}`}
+                        scope="col"
+                        className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r"
+                      >
+                        {formatCategory(category)}
+                      </th>
+                    )
+                  )}
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -289,71 +323,244 @@ const RatingsTable: React.FC = () => {
                       {row.modelId === "1" && <sup>3</sup>}
                     </td>
                     {/* Male Category Cells */}
-                    {groupedCategories.male.map((category, catIdx) => {
-                      // Determine if this cell has the highest score
-                      const cellData = row[category];
-                      const isHighestScore =
-                        row.modelId !== "0" &&
-                        cellData !== undefined &&
-                        typeof cellData === "object" &&
-                        "avg" in cellData &&
-                        Math.abs(cellData.avg - highestScores[category]) <
-                          0.001; // Use small epsilon for float comparison
-
-                      return (
-                        <td
-                          key={`male-cell-${catIdx}`}
-                          className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500 border-r"
-                        >
-                          {cellData !== undefined &&
+                    {naturalnessCategoriesGrouped.male.map(
+                      (category, catIdx) => {
+                        // Determine if this cell has the highest score
+                        const cellData = row[category];
+                        const isHighestScore =
+                          row.modelId !== "0" &&
+                          cellData !== undefined &&
                           typeof cellData === "object" &&
                           "avg" in cellData &&
-                          "count" in cellData ? (
-                            <span className={isHighestScore ? "font-bold" : ""}>
-                              {cellData.avg.toFixed(2)}/{cellData.count}
-                            </span>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-                      );
-                    })}
+                          Math.abs(cellData.avg - highestScores[category]) <
+                            0.001; // Use small epsilon for float comparison
+
+                        return (
+                          <td
+                            key={`male-cell-${catIdx}`}
+                            className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500 border-r"
+                          >
+                            {cellData !== undefined &&
+                            typeof cellData === "object" &&
+                            "avg" in cellData &&
+                            "count" in cellData ? (
+                              <span
+                                className={isHighestScore ? "font-bold" : ""}
+                              >
+                                {cellData.avg.toFixed(2)}/{cellData.count}
+                              </span>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                        );
+                      }
+                    )}
 
                     {/* Female Category Cells */}
-                    {groupedCategories.female.map((category, catIdx) => {
-                      // Determine if this cell has the highest score
-                      const cellData = row[category];
-                      const isHighestScore =
-                        row.modelId !== "0" &&
-                        cellData !== undefined &&
-                        typeof cellData === "object" &&
-                        "avg" in cellData &&
-                        Math.abs(cellData.avg - highestScores[category]) <
-                          0.001; // Use small epsilon for float comparison
-
-                      return (
-                        <td
-                          key={`female-cell-${catIdx}`}
-                          className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500 border-r"
-                        >
-                          {cellData !== undefined &&
+                    {naturalnessCategoriesGrouped.female.map(
+                      (category, catIdx) => {
+                        // Determine if this cell has the highest score
+                        const cellData = row[category];
+                        const isHighestScore =
+                          row.modelId !== "0" &&
+                          cellData !== undefined &&
                           typeof cellData === "object" &&
                           "avg" in cellData &&
-                          "count" in cellData ? (
-                            <span className={isHighestScore ? "font-bold" : ""}>
-                              {cellData.avg.toFixed(2)}/{cellData.count}
-                            </span>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-                      );
-                    })}
+                          Math.abs(cellData.avg - highestScores[category]) <
+                            0.001; // Use small epsilon for float comparison
+
+                        return (
+                          <td
+                            key={`female-cell-${catIdx}`}
+                            className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500 border-r"
+                          >
+                            {cellData !== undefined &&
+                            typeof cellData === "object" &&
+                            "avg" in cellData &&
+                            "count" in cellData ? (
+                              <span
+                                className={isHighestScore ? "font-bold" : ""}
+                              >
+                                {cellData.avg.toFixed(2)}/{cellData.count}
+                              </span>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                        );
+                      }
+                    )}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          {/* Similarity Table */}
+          {data.similarityCategories &&
+            data.similarityCategories.length > 0 && (
+              <>
+                <h2 className="text-2xl font-bold mb-6 mt-12">
+                  {t.similarityTitle}
+                </h2>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200 border">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th
+                          scope="col"
+                          rowSpan={2}
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-b"
+                        >
+                          Model
+                        </th>
+                        {/* Male Category Group for Similarity */}
+                        {similarityCategoriesGrouped.male.length > 0 && (
+                          <th
+                            scope="col"
+                            colSpan={similarityCategoriesGrouped.male.length}
+                            className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-b"
+                          >
+                            {t.male}
+                          </th>
+                        )}
+                        {/* Female Category Group for Similarity */}
+                        {similarityCategoriesGrouped.female.length > 0 && (
+                          <th
+                            scope="col"
+                            colSpan={similarityCategoriesGrouped.female.length}
+                            className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-b"
+                          >
+                            {t.female}
+                          </th>
+                        )}
+                      </tr>
+                      <tr>
+                        {/* Male Similarity Categories */}
+                        {similarityCategoriesGrouped.male.map(
+                          (category, index) => (
+                            <th
+                              key={`sim-male-${index}`}
+                              scope="col"
+                              className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r"
+                            >
+                              {formatCategory(category)}
+                            </th>
+                          )
+                        )}
+                        {/* Female Similarity Categories */}
+                        {similarityCategoriesGrouped.female.map(
+                          (category, index) => (
+                            <th
+                              key={`sim-female-${index}`}
+                              scope="col"
+                              className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r"
+                            >
+                              {formatCategory(category)}
+                            </th>
+                          )
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {data.tableData.map((row, rowIdx) => (
+                        <tr
+                          key={rowIdx}
+                          className={
+                            rowIdx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                          }
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r">
+                            {row.modelName}
+                            {row.modelId === "5" && <sup>1</sup>}
+                            {row.modelId === "2" && <sup>2</sup>}
+                            {row.modelId === "1" && <sup>3</sup>}
+                          </td>
+                          {/* Male Similarity Cells */}
+                          {similarityCategoriesGrouped.male.map(
+                            (category, catIdx) => {
+                              // Determine if this cell has the highest score
+                              const cellData = row[category];
+                              const isHighestScore =
+                                row.modelId !== "0" &&
+                                cellData !== undefined &&
+                                typeof cellData === "object" &&
+                                "avg" in cellData &&
+                                Math.abs(
+                                  cellData.avg -
+                                    highestSimilarityScores[category]
+                                ) < 0.001; // Use small epsilon for float comparison
+
+                              return (
+                                <td
+                                  key={`sim-male-cell-${catIdx}`}
+                                  className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500 border-r"
+                                >
+                                  {cellData !== undefined &&
+                                  typeof cellData === "object" &&
+                                  "avg" in cellData &&
+                                  "count" in cellData ? (
+                                    <span
+                                      className={
+                                        isHighestScore ? "font-bold" : ""
+                                      }
+                                    >
+                                      {cellData.avg.toFixed(2)}/{cellData.count}
+                                    </span>
+                                  ) : (
+                                    "-"
+                                  )}
+                                </td>
+                              );
+                            }
+                          )}
+
+                          {/* Female Similarity Cells */}
+                          {similarityCategoriesGrouped.female.map(
+                            (category, catIdx) => {
+                              // Determine if this cell has the highest score
+                              const cellData = row[category];
+                              const isHighestScore =
+                                row.modelId !== "0" &&
+                                cellData !== undefined &&
+                                typeof cellData === "object" &&
+                                "avg" in cellData &&
+                                Math.abs(
+                                  cellData.avg -
+                                    highestSimilarityScores[category]
+                                ) < 0.001; // Use small epsilon for float comparison
+
+                              return (
+                                <td
+                                  key={`sim-female-cell-${catIdx}`}
+                                  className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500 border-r"
+                                >
+                                  {cellData !== undefined &&
+                                  typeof cellData === "object" &&
+                                  "avg" in cellData &&
+                                  "count" in cellData ? (
+                                    <span
+                                      className={
+                                        isHighestScore ? "font-bold" : ""
+                                      }
+                                    >
+                                      {cellData.avg.toFixed(2)}/{cellData.count}
+                                    </span>
+                                  ) : (
+                                    "-"
+                                  )}
+                                </td>
+                              );
+                            }
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
 
           <div className="mt-4 text-sm text-gray-600">
             <p>
