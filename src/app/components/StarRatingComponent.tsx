@@ -6,7 +6,7 @@ interface StarRatingComponentProps {
   maxRating?: number;
   onRatingChange: (value: number) => void;
   error?: boolean;
-  stepSize?: 0.5 | 1; // New prop to control step size
+  stepSize?: 0.5 | 1;
 }
 
 const StarRatingComponent: React.FC<StarRatingComponentProps> = ({
@@ -14,7 +14,7 @@ const StarRatingComponent: React.FC<StarRatingComponentProps> = ({
   maxRating = 5,
   onRatingChange,
   error = false,
-  stepSize = 1, // Default to half-star increments
+  stepSize = 1,
 }) => {
   const [hoveredRating, setHoveredRating] = useState(0);
   const [displayRating, setDisplayRating] = useState(rating);
