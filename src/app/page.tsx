@@ -308,6 +308,12 @@ const TTSRatingPage: React.FC = () => {
     announceToScreenReader(announcement);
   };
 
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push("/close");
+  }, [router]);
+
   if (!language) return <div>Loading...</div>;
 
   return (
