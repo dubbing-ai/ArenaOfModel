@@ -16,14 +16,14 @@ const MODEL_NAMES: Record<string, string> = {
 
 // Categories mapping based on TestState
 const CATEGORIES: Record<TestState, { label: string, gender: string, type: string, measureType: string }> = {
-  [TestState.ONE]: { label: "Seen Thai", gender: "Male", type: "seen", measureType: "naturalness" },
-  [TestState.TWO]: { label: "Seen Thai", gender: "Female", type: "seen", measureType: "naturalness" },
+  [TestState.ONE]: { label: "Seen Thai", gender: "Female", type: "seen", measureType: "naturalness" },
+  [TestState.TWO]: { label: "Seen Thai", gender: "Male", type: "seen", measureType: "naturalness" },
   [TestState.THREE]: { label: "Unseen Thai", gender: "Female", type: "unseen", measureType: "naturalness" },
-  [TestState.FOUR]: { label: "Unseen Thai w/ Trans.", gender: "Female", type: "unseen", measureType: "naturalness" },
-  [TestState.FIVE]: { label: "Unseen English", gender: "Male", type: "unseen", measureType: "naturalness" },
+  [TestState.FOUR]: { label: "Unseen English", gender: "Male", type: "unseen", measureType: "naturalness" },
+  [TestState.FIVE]: { label: "Unseen Thai w/ Trans.", gender: "Female", type: "unseen", measureType: "naturalness" },
   // Updated SIX and SEVEN to correctly reflect their categories
-  [TestState.SIX]: { label: "Unseen EN to TH", gender: "Female", type: "unseen", measureType: "similarity" },
-  [TestState.SEVEN]: { label: "Unseen TH to TH", gender: "Male", type: "unseen", measureType: "similarity" },
+  [TestState.SIX]: { label: "Unseen TH to TH", gender: "Male", type: "unseen", measureType: "similarity" },
+  [TestState.SEVEN]: { label: "Unseen EN to TH", gender: "Female", type: "unseen", measureType: "similarity" },
   [TestState.DONE]: { label: "Unknown", gender: "Unknown", type: "unknown", measureType: "unknown" }
 };
 
